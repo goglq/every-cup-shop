@@ -24,6 +24,9 @@ try
 
     builder.Services
         .AddControllers();
+
+    builder.Services
+        .AddHttpContextAccessor();
     
     builder.SetupCors();
     builder.SetupJwt();
@@ -36,10 +39,12 @@ try
     var app = builder.Build();
     Log.Information("Server finished building");
 
-    app.UseCors("Default");
-    
     app.UseSerilogRequestLogging();
     
+    app.UseCors("Default");
+
+    app.UseAuthentication();
+
     app.MapControllers();
 
     Log.Information("Server is running");

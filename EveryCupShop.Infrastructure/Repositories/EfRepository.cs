@@ -37,8 +37,11 @@ public abstract class EfRepository<TEntity> : IRepository<TEntity> where TEntity
     public void Update(TEntity item) => 
         _context.Entry(item).State = EntityState.Modified;
 
-    public void Delete(TEntity item) =>
+    public Task Delete(TEntity item)
+    {
         Entities.Remove(item);
+        return Task.CompletedTask;;
+    }
 
     public Task Save() =>
         _context.SaveChangesAsync();
