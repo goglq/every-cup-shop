@@ -17,4 +17,6 @@ public interface IUserService
     Task<(string accessToken, string refreshToken)> SignIn(string email, string password);
 
     Task SignUp(string email, string password);
+
+    Task SignOut(Guid userId);
 }

@@ -2,21 +2,27 @@
 using EveryCupShop.Core.Interfaces.Repositories;
 using EveryCupShop.Core.Interfaces.Services;
 using EveryCupShop.Core.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace EveryCupShop.Core.Services;
 
 public class UserService : IUserService
 {
+    private const string AccessTokenKey = "accessToken";
+    
     private readonly IUserRepository _userRepository;
 
     private readonly ITokenService _tokenService;
 
     private readonly ITokenRepository _tokenRepository;
 
-    public UserService(ITokenService tokenService, IUserRepository userRepository, ITokenRepository tokenRepository)
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public UserService(ITokenService tokenService, IUserRepository userRepository, ITokenRepository tokenRepository, IHttpContextAccessor httpContextAccessor)
     {
         _userRepository = userRepository;
         _tokenRepository = tokenRepository;
+        _httpContextAccessor = httpContextAccessor;
         _tokenService = tokenService;
     }
 
@@ -96,6 +102,13 @@ public class UserService : IUserService
         }
 
         await _tokenRepository.Save();
+        
+        _httpContextAccessor.HttpContext?.Response.Cookies.Append(AccessTokenKey, tokens.accessToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+        });
 
         return tokens;
     }
@@ -118,5 +131,18 @@ public class UserService : IUserService
         await _userRepository.Add(newUser);
 
         await _userRepository.Save();
+    }
+
+    public async Task SignOut(Guid userId)
+    {
+        var token = await _tokenRepository.FindByUserId(userId);
+
+        if (token is null)
+            throw new ApiUnauthorizedException();
+        
+        await _tokenRepository.Delete(token);
+        await _tokenRepository.Save();
+        
+        _httpContextAccessor.HttpContext?.Response.Cookies.Delete(AccessTokenKey);
     }
 }
