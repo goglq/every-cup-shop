@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
 using EveryCupShop.Core.Exceptions;
 using EveryCupShop.Core.Interfaces.Services;
 using EveryCupShop.Core.Models;
@@ -23,11 +24,17 @@ public class UserController : ControllerBase
 
     private readonly IValidator<CreateUserDto> _createUserValidator;
     
-    private readonly IValidator<UserLoginDto> _userLoginValidator;
+    private readonly IValidator<UserSignInDto> _userLoginValidator;
 
     private readonly ILogger<UserController> _logger;
-    
-    public UserController(IUserService userService, ITokenService tokenService, IValidator<CreateUserDto> createUserValidator, IValidator<UserLoginDto> userLoginValidator, IMapper mapper, ILogger<UserController> logger)
+
+    public UserController(
+        IUserService userService, 
+        ITokenService tokenService, 
+        IValidator<CreateUserDto> createUserValidator, 
+        IValidator<UserSignInDto> userLoginValidator, 
+        IMapper mapper, 
+        ILogger<UserController> logger)
     {
         _userService = userService;
         _tokenService = tokenService;
@@ -74,16 +81,17 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("sign-in")]
-    public async Task<ActionResult<TokensViewModel>> SignIn(UserLoginDto userLoginDto)
+    public async Task<ActionResult<TokensViewModel>> SignIn(UserSignInDto userSignInDto)
     {
         try
         {
-            var validationResult = await _userLoginValidator.ValidateAsync(userLoginDto);
+            var validationResult = await _userLoginValidator.ValidateAsync(userSignInDto);
 
             if (!validationResult.IsValid)
                 throw new ApiValidationException();
 
-            var tokens = await _userService.SignIn(userLoginDto.Email, userLoginDto.Password);
+            var tokens = await _userService.SignIn(userSignInDto.Email, userSignInDto.Password);
+
             var tokensViewModel = _mapper.Map<TokensViewModel>(tokens);
 
             return Ok(new ResponseMessage<TokensViewModel>(tokensViewModel, true, "Successfully signed in"));
@@ -92,6 +100,29 @@ public class UserController : ControllerBase
         {
             _logger.LogError(e.Message);
             return Unauthorized(new ResponseMessage<ProblemDetails>(null, false, e.Message));
+        }
+    }
+
+    [HttpDelete("sign-out")]
+    public async Task<ActionResult> SignOut()
+    {
+        try
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId is null)
+                throw new ApiUnauthorizedException();
+
+            var userGuid = Guid.Parse(userId);
+            
+            await _userService.SignOut(userGuid);
+
+            return Ok(new ResponseMessage<object>(null, true));
+        }
+        catch (ApiException e)
+        {
+            _logger.LogError(e.Message);
+            return BadRequest(new ResponseMessage<ProblemDetails>(null, false, e.Message));
         }
     }
 
