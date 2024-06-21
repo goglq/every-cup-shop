@@ -7,6 +7,7 @@ using EveryCupShop.Models;
 using EveryCupShop.ViewModels;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace EveryCupShop.Controllers;
 
@@ -16,17 +17,23 @@ public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
 
+    private readonly ITokenService _tokenService;
+
     private readonly IMapper _mapper;
 
     private readonly IValidator<CreateUserDto> _createUserValidator;
+    
+    private readonly IValidator<UserLoginDto> _userLoginValidator;
 
     private readonly ILogger<UserController> _logger;
     
-    public UserController(IUserService userService, IMapper mapper, IValidator<CreateUserDto> createUserValidator, ILogger<UserController> logger)
+    public UserController(IUserService userService, ITokenService tokenService, IValidator<CreateUserDto> createUserValidator, IValidator<UserLoginDto> userLoginValidator, IMapper mapper, ILogger<UserController> logger)
     {
         _userService = userService;
-        _mapper = mapper;
+        _tokenService = tokenService;
         _createUserValidator = createUserValidator;
+        _userLoginValidator = userLoginValidator;
+        _mapper = mapper;
         _logger = logger;
     }
 
@@ -53,18 +60,38 @@ public class UserController : ControllerBase
             var validationResult = await _createUserValidator.ValidateAsync(userDto);
 
             if (!validationResult.IsValid)
-            {
                 throw new ApiValidationException();
-            }
 
             var newUser = await _userService.CreateUser(userDto.Email, userDto.Password);
             var newUserViewModel = _mapper.Map<CreateUserViewModel>(newUser);
             return Created(Uri.UriSchemeHttp, new ResponseMessage<CreateUserViewModel>(newUserViewModel, true, "User is created"));
         }
-        catch (ApiException ex)
+        catch (ApiException e)
         {
-            _logger.LogError(ex.Message);
-            return BadRequest(new ResponseMessage<ProblemDetails>(null, false, ex.Message));
+            _logger.LogError(e.Message);
+            return BadRequest(new ResponseMessage<ProblemDetails>(null, false, e.Message));
+        }
+    }
+
+    [HttpPost("sign-in")]
+    public async Task<ActionResult<TokensViewModel>> SignIn(UserLoginDto userLoginDto)
+    {
+        try
+        {
+            var validationResult = await _userLoginValidator.ValidateAsync(userLoginDto);
+
+            if (!validationResult.IsValid)
+                throw new ApiValidationException();
+
+            var tokens = await _userService.SignIn(userLoginDto.Email, userLoginDto.Password);
+            var tokensViewModel = _mapper.Map<TokensViewModel>(tokens);
+
+            return Ok(new ResponseMessage<TokensViewModel>(tokensViewModel, true, "Successfully signed in"));
+        }
+        catch (ApiException e)
+        {
+            _logger.LogError(e.Message);
+            return Unauthorized(new ResponseMessage<ProblemDetails>(null, false, e.Message));
         }
     }
 
@@ -77,16 +104,26 @@ public class UserController : ControllerBase
             var checkEmailViewModel = _mapper.Map<CheckEmailViewModel>(isEmailAvailable);
             return Ok(new ResponseMessage<CheckEmailViewModel>(checkEmailViewModel, true));
         }
-        catch (ApiException ex)
+        catch (ApiException e)
         {
-            _logger.LogError(ex.Message);
-            return BadRequest(new ResponseMessage<ProblemDetails>(null, false, ex.Message));
+            _logger.LogError(e.Message);
+            return BadRequest(new ResponseMessage<ProblemDetails>(null, false, e.Message));
         }
     }
 
-    [HttpGet("refresh-tokens")]
-    public async Task<ActionResult<TokensViewModel>> RefreshToken()
+    [HttpPost("refresh-tokens")]
+    public async Task<ActionResult<TokensViewModel>> RefreshToken(RefreshTokenDto refreshTokenDto)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var tokens = await _tokenService.RefreshTokens(refreshTokenDto.RefreshToken);
+            var tokensViewModel = _mapper.Map<TokensViewModel>(tokens);
+            return Ok(new ResponseMessage<TokensViewModel>(tokensViewModel, true));
+        }
+        catch (ApiException e)
+        {
+            _logger.LogError(e.Message);
+            return Unauthorized(new ResponseMessage<ProblemDetails>(null, false, e.Message));
+        }
     }
 }

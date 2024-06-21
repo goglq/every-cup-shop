@@ -2,7 +2,6 @@
 using EveryCupShop.Core.Interfaces.Repositories;
 using EveryCupShop.Core.Interfaces.Services;
 using EveryCupShop.Core.Models;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace EveryCupShop.Core.Services;
 
@@ -12,9 +11,12 @@ public class UserService : IUserService
 
     private readonly ITokenService _tokenService;
 
-    public UserService(IUserRepository userRepository, ITokenService tokenService)
+    private readonly ITokenRepository _tokenRepository;
+
+    public UserService(ITokenService tokenService, IUserRepository userRepository, ITokenRepository tokenRepository)
     {
         _userRepository = userRepository;
+        _tokenRepository = tokenRepository;
         _tokenService = tokenService;
     }
 
@@ -66,7 +68,7 @@ public class UserService : IUserService
         return user is not null;
     }
 
-    public async Task<(string, string)> SignIn(string email, string password)
+    public async Task<(string accessToken, string refreshToken)> SignIn(string email, string password)
     {
         var user = await _userRepository.Find(email);
 
@@ -76,6 +78,24 @@ public class UserService : IUserService
         }
 
         var tokens = _tokenService.GenerateTokens(user);
+
+        var token = await _tokenRepository.FindByUserId(user.Id);
+
+        if (token is null)
+        {
+            await _tokenRepository.Add(new Token()
+            {
+                RefreshToken = tokens.refreshToken,
+                UserId = user.Id
+            });
+        }
+        else
+        {
+            token.RefreshToken = tokens.refreshToken;
+            _tokenRepository.Update(token);
+        }
+
+        await _tokenRepository.Save();
 
         return tokens;
     }

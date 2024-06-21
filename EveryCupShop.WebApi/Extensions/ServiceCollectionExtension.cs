@@ -19,16 +19,19 @@ public static class ServiceCollectionExtension
 
     public static void AddAppValidation(this IServiceCollection service)
     {
-        service.AddScoped<IValidator<CreateUserDto>, CreateUserValidator>();
+        service.AddScoped<IValidator<CreateUserDto>, CreateUserDtoValidator>();
+        service.AddScoped<IValidator<UserLoginDto>, UserLoginDtoValidator>();
     }
 
     public static void AddAppRepositories(this IServiceCollection service)
     {
         service.AddScoped<IUserRepository, UserEfRepository>();
+        service.AddScoped<ITokenRepository, TokenEfRepository>();
     }
 
     public static void AddAppMapperProfiles(this IServiceCollection service)
     {
         service.AddAutoMapper(typeof(UserMappingProfile));
+        service.AddAutoMapper(typeof(TokenMappingProfile));
     }
 }

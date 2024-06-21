@@ -1,6 +1,8 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using EveryCupShop.Core.Configs;
+using EveryCupShop.Core.Exceptions;
+using EveryCupShop.Core.Interfaces.Repositories;
 using EveryCupShop.Core.Interfaces.Services;
 using EveryCupShop.Core.Models;
 using Microsoft.Extensions.Options;
@@ -15,15 +17,35 @@ public class TokenService : ITokenService
 
     private readonly JwtConfig _refreshOptions;
 
-    public TokenService(IOptionsSnapshot<JwtConfig> options)
+    private readonly ITokenRepository _tokenRepository;
+
+    private readonly IUserRepository _userRepository;
+
+    public TokenService(IOptionsSnapshot<JwtConfig> options, ITokenRepository tokenRepository, IUserRepository userRepository)
     {
+        _tokenRepository = tokenRepository;
+        _userRepository = userRepository;
         _accessOptions = options.Get($"Access{nameof(JwtConfig)}");
         _refreshOptions = options.Get($"Refresh{nameof(JwtConfig)}");
     }
     
     public async Task<(string accessToken, string refreshToken)> RefreshTokens(string refreshToken)
     {
-        throw new NotImplementedException();
+        var token = await _tokenRepository.Find(refreshToken);
+
+        if (token is null) throw new UnauthorizedAccessException();
+
+        var user = await _userRepository.Find(token.UserId);
+
+        if (user is null) throw new UserNotFoundException();
+
+        var tokens = GenerateTokens(user);
+
+        token.RefreshToken = tokens.refreshToken;
+        _tokenRepository.Update(token);
+        await _tokenRepository.Save();
+
+        return tokens;
     }
 
     public (string accessToken, string refreshToken) GenerateTokens(User user)
