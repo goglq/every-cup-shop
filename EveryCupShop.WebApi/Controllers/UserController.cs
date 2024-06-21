@@ -80,52 +80,6 @@ public class UserController : ControllerBase
         }
     }
 
-    [HttpPost("sign-in")]
-    public async Task<ActionResult<TokensViewModel>> SignIn(UserSignInDto userSignInDto)
-    {
-        try
-        {
-            var validationResult = await _userLoginValidator.ValidateAsync(userSignInDto);
-
-            if (!validationResult.IsValid)
-                throw new ApiValidationException();
-
-            var tokens = await _userService.SignIn(userSignInDto.Email, userSignInDto.Password);
-
-            var tokensViewModel = _mapper.Map<TokensViewModel>(tokens);
-
-            return Ok(new ResponseMessage<TokensViewModel>(tokensViewModel, true, "Successfully signed in"));
-        }
-        catch (ApiException e)
-        {
-            _logger.LogError(e.Message);
-            return Unauthorized(new ResponseMessage<ProblemDetails>(null, false, e.Message));
-        }
-    }
-
-    [HttpDelete("sign-out")]
-    public async Task<ActionResult> SignOut()
-    {
-        try
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (userId is null)
-                throw new ApiUnauthorizedException();
-
-            var userGuid = Guid.Parse(userId);
-            
-            await _userService.SignOut(userGuid);
-
-            return Ok(new ResponseMessage<object>(null, true));
-        }
-        catch (ApiException e)
-        {
-            _logger.LogError(e.Message);
-            return BadRequest(new ResponseMessage<ProblemDetails>(null, false, e.Message));
-        }
-    }
-
     [HttpGet("check-email")]
     public async Task<ActionResult<bool>> Check(string email)
     {
@@ -139,22 +93,6 @@ public class UserController : ControllerBase
         {
             _logger.LogError(e.Message);
             return BadRequest(new ResponseMessage<ProblemDetails>(null, false, e.Message));
-        }
-    }
-
-    [HttpPost("refresh-tokens")]
-    public async Task<ActionResult<TokensViewModel>> RefreshToken(RefreshTokenDto refreshTokenDto)
-    {
-        try
-        {
-            var tokens = await _tokenService.RefreshTokens(refreshTokenDto.RefreshToken);
-            var tokensViewModel = _mapper.Map<TokensViewModel>(tokens);
-            return Ok(new ResponseMessage<TokensViewModel>(tokensViewModel, true));
-        }
-        catch (ApiException e)
-        {
-            _logger.LogError(e.Message);
-            return Unauthorized(new ResponseMessage<ProblemDetails>(null, false, e.Message));
         }
     }
 }
