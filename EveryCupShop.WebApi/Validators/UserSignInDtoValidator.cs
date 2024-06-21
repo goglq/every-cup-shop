@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace EveryCupShop.Validators;
 
-public class UserLoginDtoValidator : AbstractValidator<UserLoginDto>
+public class UserSignInDtoValidator : AbstractValidator<UserSignInDto>
 {
-    public UserLoginDtoValidator()
+    public UserSignInDtoValidator()
     {
         RuleFor(dto => dto.Email)
             .NotEmpty()
