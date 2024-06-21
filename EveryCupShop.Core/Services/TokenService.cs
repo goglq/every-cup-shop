@@ -33,7 +33,7 @@ public class TokenService : ITokenService
     {
         var token = await _tokenRepository.Find(refreshToken);
 
-        if (token is null) throw new UnauthorizedAccessException();
+        if (token is null) throw new ApiUnauthorizedException();
 
         var user = await _userRepository.Find(token.UserId);
 
