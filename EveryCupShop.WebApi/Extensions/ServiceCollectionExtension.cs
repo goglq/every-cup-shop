@@ -22,6 +22,7 @@ public static class ServiceCollectionExtension
     {
         service.AddScoped<IValidator<CreateUserDto>, CreateUserDtoValidator>();
         service.AddScoped<IValidator<UserSignInDto>, UserSignInDtoValidator>();
+        service.AddScoped<IValidator<UserSignUpDto>, UserSignUpDtoValidator>();
     }
 
     public static void AddAppRepositories(this IServiceCollection service)

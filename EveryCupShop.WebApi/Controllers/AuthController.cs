@@ -20,7 +20,7 @@ public class AuthController : ControllerBase
 
     private readonly IAuthService _authService;
 
-    private readonly IValidator<CreateUserDto> _createUserValidator;
+    private readonly IValidator<UserSignUpDto> _userSignUpValidator;
     
     private readonly IValidator<UserSignInDto> _userLoginValidator;
 
@@ -28,23 +28,23 @@ public class AuthController : ControllerBase
         ILogger<AuthController> logger,
         IMapper mapper,
         IAuthService authService,
-        IValidator<CreateUserDto> createUserValidator, 
+        IValidator<UserSignUpDto> userSignUpValidator, 
         IValidator<UserSignInDto> userLoginValidator)
     {
         _mapper = mapper;
-        _createUserValidator = createUserValidator;
+        _userSignUpValidator = userSignUpValidator;
         _userLoginValidator = userLoginValidator;
         _authService = authService;
         _logger = logger;
     }
 
     [HttpPost]
-    public async Task<ActionResult<CreateUserViewModel>> SignUp(CreateUserDto userDto)
+    public async Task<ActionResult<CreateUserViewModel>> SignUp(UserSignUpDto userDto)
     {
         try
         {
             _logger.LogInformation("Creating a new user");
-            var validationResult = await _createUserValidator.ValidateAsync(userDto);
+            var validationResult = await _userSignUpValidator.ValidateAsync(userDto);
 
             if (!validationResult.IsValid)
                 throw new ApiValidationException();
