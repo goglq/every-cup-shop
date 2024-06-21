@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using AutoMapper;
+﻿using AutoMapper;
 using EveryCupShop.Core.Exceptions;
 using EveryCupShop.Core.Interfaces.Services;
 using EveryCupShop.Core.Models;
@@ -8,7 +7,6 @@ using EveryCupShop.Models;
 using EveryCupShop.ViewModels;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 
 namespace EveryCupShop.Controllers;
 
@@ -18,28 +16,20 @@ public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
 
-    private readonly ITokenService _tokenService;
-
     private readonly IMapper _mapper;
 
     private readonly IValidator<CreateUserDto> _createUserValidator;
-    
-    private readonly IValidator<UserSignInDto> _userLoginValidator;
 
     private readonly ILogger<UserController> _logger;
 
     public UserController(
-        IUserService userService, 
-        ITokenService tokenService, 
-        IValidator<CreateUserDto> createUserValidator, 
-        IValidator<UserSignInDto> userLoginValidator, 
+        IUserService userService,
+        IValidator<CreateUserDto> createUserValidator,
         IMapper mapper, 
         ILogger<UserController> logger)
     {
         _userService = userService;
-        _tokenService = tokenService;
         _createUserValidator = createUserValidator;
-        _userLoginValidator = userLoginValidator;
         _mapper = mapper;
         _logger = logger;
     }
