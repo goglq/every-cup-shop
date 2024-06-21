@@ -15,6 +15,7 @@ public static class ServiceCollectionExtension
     {
         service.AddScoped<ITokenService, TokenService>();
         service.AddScoped<IUserService, UserService>();
+        service.AddScoped<IAuthService, AuthService>();
     }
 
     public static void AddAppValidation(this IServiceCollection service)
