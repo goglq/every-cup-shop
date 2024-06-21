@@ -45,7 +45,7 @@ try
     Log.Information("Server is running");
     app.Run();
 }
-catch (Exception ex) when (ex.GetType().Name != "StopTheHostException")
+catch (Exception ex) when (ex.GetType().Name != "HostAbortedException")
 {
     Log.Fatal(ex, @"Unhandled exception {ExceptionType}", ex.GetType().Name);
 }
