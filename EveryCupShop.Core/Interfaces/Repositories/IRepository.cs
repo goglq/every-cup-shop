@@ -12,7 +12,7 @@ public interface IRepository<T> where T : class, IEntity
 
     void Update(T item);
 
-    void Delete(T item);
+    Task Delete(T item);
 
     Task Save();
 }
