@@ -2,7 +2,6 @@
 using AutoMapper;
 using EveryCupShop.Core.Exceptions;
 using EveryCupShop.Core.Interfaces.Services;
-using EveryCupShop.Core.Models;
 using EveryCupShop.Dtos;
 using EveryCupShop.Models;
 using EveryCupShop.ViewModels;
@@ -18,10 +17,8 @@ public class AuthController : ControllerBase
     private readonly ILogger<AuthController> _logger;
     
     private readonly IMapper _mapper;
-    
-    private readonly ITokenService _tokenService;
 
-    private readonly IUserService _userService;
+    private readonly IAuthService _authService;
 
     private readonly IValidator<CreateUserDto> _createUserValidator;
     
@@ -29,17 +26,15 @@ public class AuthController : ControllerBase
 
     public AuthController(
         ILogger<AuthController> logger,
-        IMapper mapper, 
-        ITokenService tokenService, 
-        IUserService userService, 
+        IMapper mapper,
+        IAuthService authService,
         IValidator<CreateUserDto> createUserValidator, 
         IValidator<UserSignInDto> userLoginValidator)
     {
         _mapper = mapper;
-        _tokenService = tokenService;
-        _userService = userService;
         _createUserValidator = createUserValidator;
         _userLoginValidator = userLoginValidator;
+        _authService = authService;
         _logger = logger;
     }
 
@@ -54,7 +49,7 @@ public class AuthController : ControllerBase
             if (!validationResult.IsValid)
                 throw new ApiValidationException();
 
-            var newUser = await _userService.CreateUser(userDto.Email, userDto.Password);
+            var newUser = await _authService.SignUp(userDto.Email, userDto.Password);
             var newUserViewModel = _mapper.Map<CreateUserViewModel>(newUser);
             return Created(Uri.UriSchemeHttp, new ResponseMessage<CreateUserViewModel>(newUserViewModel, true, "User is created"));
         }
@@ -75,7 +70,7 @@ public class AuthController : ControllerBase
             if (!validationResult.IsValid)
                 throw new ApiValidationException();
 
-            var tokens = await _userService.SignIn(userSignInDto.Email, userSignInDto.Password);
+            var tokens = await _authService.SignIn(userSignInDto.Email, userSignInDto.Password);
 
             var tokensViewModel = _mapper.Map<TokensViewModel>(tokens);
 
@@ -100,7 +95,7 @@ public class AuthController : ControllerBase
 
             var userGuid = Guid.Parse(userId);
             
-            await _userService.SignOut(userGuid);
+            await _authService.SignOut(userGuid);
             
             return Ok(new ResponseMessage<object>(null, true));
         }
@@ -116,7 +111,7 @@ public class AuthController : ControllerBase
     {
         try
         {
-            var tokens = await _tokenService.RefreshTokens(refreshTokenDto.RefreshToken);
+            var tokens = await _authService.Refresh(refreshTokenDto.RefreshToken);
             var tokensViewModel = _mapper.Map<TokensViewModel>(tokens);
             return Ok(new ResponseMessage<TokensViewModel>(tokensViewModel, true));
         }
