@@ -15,12 +15,14 @@ public static class ServiceCollectionExtension
     {
         service.AddScoped<ITokenService, TokenService>();
         service.AddScoped<IUserService, UserService>();
+        service.AddScoped<IAuthService, AuthService>();
     }
 
     public static void AddAppValidation(this IServiceCollection service)
     {
         service.AddScoped<IValidator<CreateUserDto>, CreateUserDtoValidator>();
         service.AddScoped<IValidator<UserSignInDto>, UserSignInDtoValidator>();
+        service.AddScoped<IValidator<UserSignUpDto>, UserSignUpDtoValidator>();
     }
 
     public static void AddAppRepositories(this IServiceCollection service)

@@ -13,10 +13,4 @@ public interface IUserService
     Task<User> GetUser(Guid id);
 
     Task<bool> CheckEmail(string email);
-
-    Task<(string accessToken, string refreshToken)> SignIn(string email, string password);
-
-    Task SignUp(string email, string password);
-
-    Task SignOut(Guid userId);
 }
