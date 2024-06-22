@@ -4,7 +4,7 @@ using EveryCupShop.Infrastructure.Database;
 
 namespace EveryCupShop.Infrastructure.Repositories;
 
-public class OrderItemRepository : EfRepository<OrderItem>, IOrderItemRepository
+public class OrderItemEfRepository : EfRepository<OrderItem>, IOrderItemRepository
 {
-    public OrderItemRepository(AppDbContext context) : base(context) { }
+    public OrderItemEfRepository(AppDbContext context) : base(context) { }
 }
