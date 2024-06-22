@@ -4,7 +4,7 @@ namespace EveryCupShop.Dtos;
 
 public class ChangeOrderStateDto
 {
-    public Guid OrderId { get; set; }
+    public Guid OrderId { get; init; }
     
-    public OrderState State { get; set; }
+    public OrderState State { get; init; }
 }

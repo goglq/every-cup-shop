@@ -2,5 +2,5 @@
 
 public class CreateOrderDto
 {
-    public IDictionary<Guid, int> CupIdsAmount { get; set; }
+    public IDictionary<Guid, int> CupIdsAmount { get; init; }
 }
