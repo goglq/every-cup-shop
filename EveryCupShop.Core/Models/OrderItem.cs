@@ -10,13 +10,9 @@ public class OrderItem : IEntity
     
     public Guid OrderId { get; set; }
     
-    public CupShape CupShape { get; set; }
+    public Cup Cup { get; set; }
     
-    public Guid CupShapeId { get; set; }
-    
-    public CupAttachment CupAttachment { get; set; }
-    
-    public Guid CupAttachmentId { get; set; }
+    public Guid CupId { get; set; }
 
     public int Amount { get; set; } = 1;
 }
