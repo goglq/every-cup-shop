@@ -33,6 +33,10 @@ public static class ServiceCollectionExtension
         
         service.AddScoped<IValidator<CreateOrderDto>, CreateOrderDtoValidator>();
         service.AddScoped<IValidator<ChangeOrderStateDto>, ChangeOrderStateDtoValidator>();
+
+        service.AddScoped<IValidator<CreateCupShapeDto>, CreateCupShapeDtoValidator>();
+        service.AddScoped<IValidator<CreateCupAttachmentDto>, CreateCupAttachmentDtoValidator>();
+        service.AddScoped<IValidator<CreateCupDto>, CreateCupDtoValidator>();
     }
 
     public static void AddAppRepositories(this IServiceCollection service)
