@@ -3,6 +3,7 @@ using EveryCupShop.Core.Interfaces.Repositories;
 using EveryCupShop.Core.Interfaces.Services;
 using EveryCupShop.Core.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 
 namespace EveryCupShop.Core.Services;
 
@@ -25,16 +26,20 @@ public class AuthService : IAuthService
 
     private readonly IHttpContextAccessor _httpContextAccessor;
 
+    private readonly IPasswordHasher<User> _passwordHasher;
+
     public AuthService(
         ITokenService tokenService, 
         IUserRepository userRepository, 
         ITokenRepository tokenRepository, 
-        IHttpContextAccessor httpContextAccessor)
+        IHttpContextAccessor httpContextAccessor, 
+        IPasswordHasher<User> passwordHasher)
     {
         _tokenService = tokenService;
         _userRepository = userRepository;
         _tokenRepository = tokenRepository;
         _httpContextAccessor = httpContextAccessor;
+        _passwordHasher = passwordHasher;
     }
 
 
@@ -47,6 +52,11 @@ public class AuthService : IAuthService
             throw new UserNotFoundException();
         }
 
+        var verificationResult = _passwordHasher.VerifyHashedPassword(user, user.Password, password);
+
+        if (verificationResult == PasswordVerificationResult.Failed)
+            throw new ApiUnauthorizedException("Wrong password");
+        
         var tokens = _tokenService.GenerateTokens(user);
 
         var token = await _tokenRepository.FindByUserId(user.Id);
@@ -77,18 +87,17 @@ public class AuthService : IAuthService
         var candidate = await _userRepository.Find(email);
 
         if (candidate is not null)
-        {
             throw new EmailIsTakenException();
-        }
 
         var newUser = new User
         {
-            Email = email,
-            Password = password
+            Email = email
         };
 
+        var hashedPassword = _passwordHasher.HashPassword(newUser, password);
+        newUser.Password = hashedPassword;
+        
         var signedUser = await _userRepository.Add(newUser);
-
         await _userRepository.Save();
 
         return signedUser;
