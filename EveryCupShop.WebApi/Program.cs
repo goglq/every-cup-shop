@@ -1,5 +1,6 @@
 using EveryCupShop.Extensions;
 using EveryCupShop.Infrastructure.Database;
+using EveryCupShop.Middlewares;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
@@ -39,6 +40,8 @@ try
     var app = builder.Build();
     Log.Information("Server finished building");
 
+    // app.UseHttpsRedirection();
+    app.UseMiddleware<LoggerMiddleware>();
     app.UseSerilogRequestLogging();
     
     app.UseCors("Default");
