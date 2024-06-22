@@ -15,14 +15,14 @@ public class OrderItemEntityConfig : IEntityTypeConfiguration<OrderItem>
             .WithMany(order => order.OrderItems)
             .HasForeignKey(item => item.OrderId);
 
-        builder
-            .HasOne(item => item.CupAttachment)
-            .WithMany(attachment => attachment.OrderItems)
-            .HasForeignKey(item => item.CupAttachmentId);
-
-        builder
-            .HasOne(item => item.CupShape)
-            .WithMany(shape => shape.OrderItems)
-            .HasForeignKey(item => item.CupShapeId);
+        // builder
+        //     .HasOne(item => item.CupAttachment)
+        //     .WithMany(attachment => attachment.OrderItems)
+        //     .HasForeignKey(item => item.CupAttachmentId);
+        //
+        // builder
+        //     .HasOne(item => item.CupShape)
+        //     .WithMany(shape => shape.OrderItems)
+        //     .HasForeignKey(item => item.CupShapeId);
     }
 }
