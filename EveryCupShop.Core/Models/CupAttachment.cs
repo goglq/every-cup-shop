@@ -14,5 +14,6 @@ public class CupAttachment : IEntity
 
     public int Amount { get; set; }
     
-    public IList<OrderItem> OrderItems { get; set; }
+    // public IList<OrderItem> OrderItems { get; set; }
+    public IList<Cup> Cups { get; set; }
 }
