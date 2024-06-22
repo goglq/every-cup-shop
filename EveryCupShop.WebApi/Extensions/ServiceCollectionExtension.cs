@@ -57,5 +57,6 @@ public static class ServiceCollectionExtension
         service.AddAutoMapper(typeof(UserMappingProfile));
         service.AddAutoMapper(typeof(TokenMappingProfile));
         service.AddAutoMapper(typeof(OrderMappingProfile));
+        service.AddAutoMapper(typeof(CupMappingProfile));
     }
 }
