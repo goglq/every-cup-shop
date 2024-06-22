@@ -60,4 +60,17 @@ public class CupService : ICupService
         await _cupRepository.Save();
         return createdCup;
     }
+
+    public async Task<Cup> ChangeCup(Guid cupId, Guid cupShapeId, Guid cupAttachmentId)
+    {
+        var cup = await _cupRepository.Get(cupId);
+
+        cup.CupShapeId = cupShapeId;
+        cup.CupAttachmentId = cupAttachmentId;
+        
+        var updatedCup = await _cupRepository.Update(cup);
+        await _cupRepository.Save();
+
+        return updatedCup;
+    }
 }
