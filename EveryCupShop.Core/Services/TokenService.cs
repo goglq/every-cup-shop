@@ -7,7 +7,6 @@ using EveryCupShop.Core.Interfaces.Services;
 using EveryCupShop.Core.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 namespace EveryCupShop.Core.Services;
 
