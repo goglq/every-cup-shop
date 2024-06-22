@@ -1,4 +1,4 @@
-﻿using EveryCupShop.Core.Interfaces.Repositories;
+using EveryCupShop.Core.Interfaces.Repositories;
 using EveryCupShop.Core.Interfaces.Services;
 using EveryCupShop.Core.Models;
 using EveryCupShop.Core.Services;
@@ -21,6 +21,10 @@ public static class ServiceCollectionExtension
         service.AddScoped<IAuthService, AuthService>();
         
         service.AddScoped<IUserService, UserService>();
+        service.AddScoped<IAuthService, AuthService>();
+        
+        service.AddScoped<IOrderService, OrderService>();
+        service.AddScoped<ICupService, CupService>();
 
         service.AddScoped<IEmailSender, MimeEmailSender>();
     }
@@ -30,17 +34,28 @@ public static class ServiceCollectionExtension
         service.AddScoped<IValidator<CreateUserDto>, CreateUserDtoValidator>();
         service.AddScoped<IValidator<UserSignInDto>, UserSignInDtoValidator>();
         service.AddScoped<IValidator<UserSignUpDto>, UserSignUpDtoValidator>();
+        
+        service.AddScoped<IValidator<CreateOrderDto>, CreateOrderDtoValidator>();
+        service.AddScoped<IValidator<ChangeOrderStateDto>, ChangeOrderStateDtoValidator>();
     }
 
     public static void AddAppRepositories(this IServiceCollection service)
     {
         service.AddScoped<IUserRepository, UserEfRepository>();
         service.AddScoped<ITokenRepository, TokenEfRepository>();
+        
+        service.AddScoped<ICupRepository, CupEfRepository>();
+        service.AddScoped<ICupShapeRepository, CupShapeEfRepository>();
+        service.AddScoped<ICupAttachmentRepository, CupAttachmentEfRepository>();
+        
+        service.AddScoped<IOrderRepository, OrderEfRepository>();
+        service.AddScoped<IOrderItemRepository, OrderItemEfRepository>();
     }
 
     public static void AddAppMapperProfiles(this IServiceCollection service)
     {
         service.AddAutoMapper(typeof(UserMappingProfile));
         service.AddAutoMapper(typeof(TokenMappingProfile));
+        service.AddAutoMapper(typeof(OrderMappingProfile));
     }
 }
