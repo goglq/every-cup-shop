@@ -34,9 +34,13 @@ public abstract class EfRepository<TEntity> : IRepository<TEntity> where TEntity
         return entry.Entity;
     }
 
-    public void Update(TEntity item) => 
-        _context.Entry(item).State = EntityState.Modified;
-
+    public Task<TEntity> Update(TEntity item)
+    {
+        var entry = _context.Entry(item);
+        entry.State = EntityState.Modified;
+        return Task.FromResult(entry.Entity);
+    }
+    
     public Task Delete(TEntity item)
     {
         Entities.Remove(item);
