@@ -2,9 +2,9 @@
 
 public class ChangeCupDto
 {
-    public Guid CupId { get; }
+    public Guid CupId { get; init; }
     
-    public Guid CupAttachmentId { get; }
+    public Guid CupAttachmentId { get; init; }
     
-    public Guid CupShapeId { get; }
+    public Guid CupShapeId { get; init; }
 }
