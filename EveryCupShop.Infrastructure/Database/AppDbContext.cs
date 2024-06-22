@@ -6,6 +6,11 @@ namespace EveryCupShop.Infrastructure.Database;
 public class AppDbContext : DbContext
 {
     public DbSet<User> Users => Set<User>();
+    public DbSet<Token> Tokens => Set<Token>();
+    public DbSet<CupShape> CupShapes => Set<CupShape>();
+    public DbSet<CupAttachment> CupAttachments => Set<CupAttachment>();
+    public DbSet<Order> Orders => Set<Order>();
+    public DbSet<OrderItem> OrderItems => Set<OrderItem>();
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
