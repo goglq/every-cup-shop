@@ -10,10 +10,13 @@ public class CupService : ICupService
 
     private readonly ICupAttachmentRepository _cupAttachmentRepository;
 
-    public CupService(ICupShapeRepository cupShapeRepository, ICupAttachmentRepository cupAttachmentRepository)
+    private readonly ICupRepository _cupRepository;
+
+    public CupService(ICupShapeRepository cupShapeRepository, ICupAttachmentRepository cupAttachmentRepository, ICupRepository cupRepository)
     {
         _cupShapeRepository = cupShapeRepository;
         _cupAttachmentRepository = cupAttachmentRepository;
+        _cupRepository = cupRepository;
     }
 
     public async Task<CupAttachment> CreateAttachment(string name, string description, decimal price, int amount)
@@ -43,5 +46,18 @@ public class CupService : ICupService
         var createdShape = await _cupShapeRepository.Add(newShape);
         await _cupShapeRepository.Save();
         return createdShape;
+    }
+
+    public async Task<Cup> CreateCup(Guid cupShapeId, Guid cupAttachmentId)
+    {
+        var newCup = new Cup
+        {
+            CupShapeId = cupShapeId,
+            CupAttachmentId = cupAttachmentId
+        };
+
+        var createdCup = await _cupRepository.Add(newCup);
+        await _cupRepository.Save();
+        return createdCup;
     }
 }
