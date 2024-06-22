@@ -47,6 +47,7 @@ try
     app.UseCors("Default");
 
     app.UseAuthentication();
+    app.UseAuthorization();
 
     app.MapControllers();
 

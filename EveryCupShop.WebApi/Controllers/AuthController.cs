@@ -6,6 +6,7 @@ using EveryCupShop.Dtos;
 using EveryCupShop.Models;
 using EveryCupShop.ViewModels;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EveryCupShop.Controllers;
@@ -83,6 +84,7 @@ public class AuthController : ControllerBase
         }
     }
 
+    [Authorize]
     [HttpDelete]
     public async Task<ActionResult> LogOut()
     {

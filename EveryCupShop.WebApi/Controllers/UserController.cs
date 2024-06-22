@@ -6,6 +6,7 @@ using EveryCupShop.Dtos;
 using EveryCupShop.Models;
 using EveryCupShop.ViewModels;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EveryCupShop.Controllers;
@@ -34,13 +35,15 @@ public class UserController : ControllerBase
         _logger = logger;
     }
 
+    [Authorize]
     [HttpGet]
     public async Task<ActionResult<IList<User>>> GetAll()
     {
         var users = await _userService.GetUsers();
         return Ok(users);
     }
-
+    
+    [Authorize]
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<User>> Get(Guid id)
     {
@@ -48,6 +51,7 @@ public class UserController : ControllerBase
         return Ok(user);
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<User>> Create(CreateUserDto userDto)
     {
