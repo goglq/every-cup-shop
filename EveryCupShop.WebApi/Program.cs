@@ -28,6 +28,8 @@ try
 
     builder.Services
         .AddHttpContextAccessor();
+
+    builder.SetupEmailConfig();
     
     builder.SetupCors();
     builder.SetupJwt();
