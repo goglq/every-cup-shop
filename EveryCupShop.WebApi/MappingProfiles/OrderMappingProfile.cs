@@ -11,5 +11,6 @@ public class OrderMappingProfile : Profile
         CreateMap<Order, CreateOrderViewModel>();
         CreateMap<Order, ChangeOrderStateViewModel>();
         CreateMap<Order, AddOrderItemViewModel>();
+        CreateMap<Order, OrderViewModel>();
     }
 }
