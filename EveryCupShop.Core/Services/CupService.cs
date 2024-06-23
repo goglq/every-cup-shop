@@ -26,7 +26,7 @@ public class CupService : ICupService
     public Task<CupShape> GetCupShape(Guid id) => 
         _cupShapeRepository.Get(id);
 
-    public async Task<CupShape> CreateShape(string name, string description, decimal price, int amount)
+    public async Task<CupShape> CreateCupShape(string name, string description, decimal price, int amount)
     {
         var newShape = new CupShape
         {
@@ -39,6 +39,16 @@ public class CupService : ICupService
         var createdShape = await _cupShapeRepository.Add(newShape);
         await _cupShapeRepository.Save();
         return createdShape;
+    }
+
+    public async Task<CupShape> ChangeCupShape(Guid cupShapeId, string name, string description, decimal price, int amount)
+    {
+        var cupShape = await _cupShapeRepository.Find(cupShapeId) ?? throw new DataNotFoundException();
+        cupShape.Name = name;
+        cupShape.Description = description;
+        cupShape.Price = price;
+        cupShape.Amount = amount;
+        return cupShape;
     }
 
     public async Task<CupShape> DeleteCupShape(Guid id)
@@ -70,7 +80,17 @@ public class CupService : ICupService
         await _cupAttachmentRepository.Save();
         return createdAttachment;
     }
-    
+
+    public async Task<CupAttachment> ChangeCupAttachment(Guid cupAttachmentId, string name, string description, decimal price, int amount)
+    {
+        var cupAttachment = await _cupAttachmentRepository.Find(cupAttachmentId) ?? throw new DataNotFoundException();
+        cupAttachment.Name = name;
+        cupAttachment.Description = description;
+        cupAttachment.Price = price;
+        cupAttachment.Amount = amount;
+        return cupAttachment;
+    }
+
     public async Task<CupAttachment> DeleteCupAttachment(Guid id)
     {
         var cupAttachment = await _cupAttachmentRepository.Find(id) ?? throw new DataNotFoundException();

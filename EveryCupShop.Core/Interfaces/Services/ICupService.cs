@@ -8,7 +8,9 @@ public interface ICupService
     
     Task<CupShape> GetCupShape(Guid id);
     
-    Task<CupShape> CreateShape(string name, string description, decimal price, int amount);
+    Task<CupShape> CreateCupShape(string name, string description, decimal price, int amount);
+    
+    Task<CupShape> ChangeCupShape(Guid cupShapeId, string name, string description, decimal price, int amount);
 
     Task<CupShape> DeleteCupShape(Guid id);
 
@@ -17,6 +19,8 @@ public interface ICupService
     Task<CupAttachment> GetCupAttachment(Guid id);
 
     Task<CupAttachment> CreateAttachment(string name, string description, decimal price, int amount);
+    
+    Task<CupAttachment> ChangeCupAttachment(Guid cupAttachmentId, string name, string description, decimal price, int amount);
     
     Task<CupAttachment> DeleteCupAttachment(Guid id);
 
