@@ -23,6 +23,12 @@ public class OrderService : IOrderService
         _orderItemRepository = orderItemRepository;
         _userRepository = userRepository;
     }
+    
+    private async Task<Order> FindOrder(Guid orderId) =>
+        await _orderRepository.Find(orderId) ?? throw new DataNotFoundException();
+    
+    private async Task<OrderItem> FindOrderItem(Guid orderItemId) => 
+        await _orderItemRepository.Find(orderItemId) ?? throw new DataNotFoundException();
 
     public async Task<Order> CreateOrder(Guid userId, IDictionary<Guid, int> cupIds)
     {
@@ -55,10 +61,7 @@ public class OrderService : IOrderService
 
     public async Task<Order> ChangeOrderState(Guid orderId, OrderState state)
     {
-        var order = await _orderRepository.Find(orderId);
-
-        if (order is null)
-            throw new DataNotFoundException();
+        var order = await FindOrder(orderId);
 
         if (order.State == state)
             return order;
@@ -69,12 +72,9 @@ public class OrderService : IOrderService
         return updatedOrder;
     }
 
-    public async Task<Order> DeleteOrderItem(Guid orderId)
+    public async Task<Order> DeleteOrder(Guid orderId)
     {
-        var order = await _orderRepository.Find(orderId);
-
-        if (order is null)
-            throw new DataNotFoundException();
+        var order = await FindOrder(orderId);
 
         await _orderRepository.Delete(order);
         await _orderRepository.Save();
@@ -84,10 +84,7 @@ public class OrderService : IOrderService
 
     public async Task<OrderItem> CreateOrderItem(Guid orderId, Guid cupId, int amount)
     {
-        var order = await _orderRepository.Find(orderId);
-
-        if (order is null)
-            throw new DataNotFoundException();
+        var order = await FindOrder(orderId);
         
         var newOrderItem = new OrderItem
         {
@@ -104,10 +101,7 @@ public class OrderService : IOrderService
 
     public async Task<OrderItem> SetOderItemAmount(Guid orderItemId, int amount)
     {
-        var orderItem = await _orderItemRepository.Find(orderItemId);
-
-        if (orderItem is null)
-            throw new DataNotFoundException();
+        var orderItem = await FindOrderItem(orderItemId);
 
         orderItem.Amount = amount;
 
@@ -117,12 +111,9 @@ public class OrderService : IOrderService
         return updatedOrderItem;
     }
 
-    public async Task<OrderItem> DeleteOrder(Guid orderItemId)
+    public async Task<OrderItem> DeleteOrderItem(Guid orderItemId)
     {
-        var orderItem = await _orderItemRepository.Find(orderItemId);
-
-        if (orderItem is null)
-            throw new DataNotFoundException();
+        var orderItem = await FindOrderItem(orderItemId);
 
         await _orderItemRepository.Delete(orderItem);
         await _orderItemRepository.Save();
