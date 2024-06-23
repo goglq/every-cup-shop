@@ -93,13 +93,13 @@ public class CupController : ControllerBase
     }
     
     [HttpDelete("{id:guid}")]
-    public async Task<ActionResult<CupViewModel>> Delete(Guid id)
+    public async Task<ActionResult<DeleteCupViewModel>> Delete(Guid id)
     {
         try
         {
             var cup = await _cupService.DeleteCup(id);
-            var cupViewModel = _mapper.Map<CupViewModel>(cup);
-            return Ok(new ResponseMessage<CupViewModel>(cupViewModel, true));
+            var cupViewModel = _mapper.Map<DeleteCupViewModel>(cup);
+            return Ok(new ResponseMessage<DeleteCupViewModel>(cupViewModel, true));
         }
         catch (ApiException e)
         {
