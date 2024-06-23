@@ -81,8 +81,11 @@ public class CupController : ControllerBase
     {
         try
         {
-            var cup = await _cupService.ChangeCup(createCupDto.CupId, createCupDto.CupShapeId, createCupDto.CupAttachmentId);
+            var (cupId, cupShapeId, cupAttachmentId) = createCupDto;
+            
+            var cup = await _cupService.ChangeCup(cupId, cupShapeId, cupAttachmentId);
             var cupViewModel = _mapper.Map<ChangeCupViewModel>(cup);
+            
             return Ok(new ResponseMessage<ChangeCupViewModel>(cupViewModel, true));
         }
         catch (ApiException e)
