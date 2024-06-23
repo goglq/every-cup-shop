@@ -18,8 +18,11 @@ public static class ServiceCollectionExtension
         service.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
         
         service.AddScoped<ITokenService, TokenService>();
-        service.AddScoped<IUserService, UserService>();
         service.AddScoped<IAuthService, AuthService>();
+        
+        service.AddScoped<IUserService, UserService>();
+
+        service.AddScoped<IEmailSender, MimeEmailSender>();
     }
 
     public static void AddAppValidation(this IServiceCollection service)
