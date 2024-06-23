@@ -9,11 +9,11 @@ public interface IOrderService
 
     Task<Order> ChangeOrderState(Guid orderId, OrderState state);
     
-    Task<Order> DeleteOrderItem(Guid orderId);
+    Task<Order> DeleteOrder(Guid orderId);
 
     Task<OrderItem> CreateOrderItem(Guid orderId, Guid cupId, int amount);
 
     Task<OrderItem> SetOderItemAmount(Guid orderItemId, int amount);
 
-    Task<OrderItem> DeleteOrder(Guid orderItemId);
+    Task<OrderItem> DeleteOrderItem(Guid orderItemId);
 }
