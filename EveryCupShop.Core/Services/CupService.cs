@@ -19,6 +19,24 @@ public class CupService : ICupService
         _cupAttachmentRepository = cupAttachmentRepository;
         _cupRepository = cupRepository;
     }
+    
+    public Task<IList<CupShape>> GetCupShapes() => 
+        _cupShapeRepository.GetAll();
+
+    public Task<CupShape> GetCupShape(Guid id) => 
+        _cupShapeRepository.Get(id);
+
+    public Task<IList<CupAttachment>> GetCupAttachments() => 
+        _cupAttachmentRepository.GetAll();
+
+    public Task<CupAttachment> GetCupAttachment(Guid id) => 
+        _cupAttachmentRepository.Get(id);
+
+    public Task<IList<Cup>> GetCups() => 
+        _cupRepository.GetAll();
+
+    public Task<Cup> GetCup(Guid id) => 
+        _cupRepository.Get(id);
 
     public async Task<CupAttachment> CreateAttachment(string name, string description, decimal price, int amount)
     {
