@@ -26,32 +26,6 @@ public class CupService : ICupService
     public Task<CupShape> GetCupShape(Guid id) => 
         _cupShapeRepository.Get(id);
 
-    public Task<IList<CupAttachment>> GetCupAttachments() => 
-        _cupAttachmentRepository.GetAll();
-
-    public Task<CupAttachment> GetCupAttachment(Guid id) => 
-        _cupAttachmentRepository.Get(id);
-
-    public Task<IList<Cup>> GetCups() => 
-        _cupRepository.GetAll();
-
-    public Task<Cup> GetCup(Guid id) => 
-        _cupRepository.Get(id);
-
-    public async Task<CupAttachment> CreateAttachment(string name, string description, decimal price, int amount)
-    {
-        var newAttachment = new CupAttachment
-        {
-            Name = name,
-            Description = description,
-            Price = price,
-            Amount = amount
-        };
-        var createdAttachment = await _cupAttachmentRepository.Add(newAttachment);
-        await _cupAttachmentRepository.Save();
-        return createdAttachment;
-    }
-
     public async Task<CupShape> CreateShape(string name, string description, decimal price, int amount)
     {
         var newShape = new CupShape
@@ -67,6 +41,50 @@ public class CupService : ICupService
         return createdShape;
     }
 
+    public async Task<CupShape> DeleteCupShape(Guid id)
+    {
+        var cupShape = await _cupShapeRepository.Find(id) ?? throw new DataNotFoundException();
+
+        await _cupShapeRepository.Delete(cupShape);
+        await _cupShapeRepository.Save();
+
+        return cupShape;
+    }
+
+    public Task<IList<CupAttachment>> GetCupAttachments() => 
+        _cupAttachmentRepository.GetAll();
+
+    public Task<CupAttachment> GetCupAttachment(Guid id) => 
+        _cupAttachmentRepository.Get(id);
+    
+    public async Task<CupAttachment> CreateAttachment(string name, string description, decimal price, int amount)
+    {
+        var newAttachment = new CupAttachment
+        {
+            Name = name,
+            Description = description,
+            Price = price,
+            Amount = amount
+        };
+        var createdAttachment = await _cupAttachmentRepository.Add(newAttachment);
+        await _cupAttachmentRepository.Save();
+        return createdAttachment;
+    }
+    
+    public async Task<CupAttachment> DeleteCupAttachment(Guid id)
+    {
+        var cupAttachment = await _cupAttachmentRepository.Find(id) ?? throw new DataNotFoundException();
+        await _cupAttachmentRepository.Delete(cupAttachment);
+        await _cupAttachmentRepository.Save();
+        return cupAttachment;
+    }
+    
+    public Task<IList<Cup>> GetCups() => 
+        _cupRepository.GetAll();
+
+    public Task<Cup> GetCup(Guid id) => 
+        _cupRepository.Get(id);
+    
     public async Task<Cup> CreateCup(Guid cupShapeId, Guid cupAttachmentId)
     {
         var newCup = new Cup
@@ -79,7 +97,7 @@ public class CupService : ICupService
         await _cupRepository.Save();
         return createdCup;
     }
-
+    
     public async Task<Cup> ChangeCup(Guid cupId, Guid cupShapeId, Guid cupAttachmentId)
     {
         var cup = await _cupRepository.Find(cupId) ?? throw new DataNotFoundException();
@@ -91,5 +109,13 @@ public class CupService : ICupService
         await _cupRepository.Save();
 
         return updatedCup;
+    }
+
+    public async Task<Cup> DeleteCup(Guid id)
+    {
+        var cup = await _cupRepository.Find(id) ?? throw new DataNotFoundException();
+        await _cupRepository.Delete(cup);
+        await _cupRepository.Save();
+        return cup;
     }
 }
