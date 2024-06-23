@@ -30,6 +30,10 @@ public class OrderService : IOrderService
     private async Task<OrderItem> FindOrderItem(Guid orderItemId) => 
         await _orderItemRepository.Find(orderItemId) ?? throw new DataNotFoundException();
 
+    public Task<Order> GetOrder(Guid id) => _orderRepository.Get(id);
+
+    public Task<IList<Order>> GetOrders() => _orderRepository.GetAll();
+
     public async Task<Order> CreateOrder(Guid userId, IDictionary<Guid, int> cupIds)
     {
         var user = await _userRepository.Find(userId);
@@ -81,6 +85,10 @@ public class OrderService : IOrderService
 
         return order;
     }
+
+    public Task<OrderItem> GetOrderItem(Guid id) => _orderItemRepository.Get(id);
+
+    public Task<IList<OrderItem>> GetOrderItems() => _orderItemRepository.GetAll();
 
     public async Task<OrderItem> CreateOrderItem(Guid orderId, Guid cupId, int amount)
     {
