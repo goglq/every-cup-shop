@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using EveryCupShop.Core.Models;
 using EveryCupShop.ViewModels;
 

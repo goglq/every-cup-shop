@@ -1,4 +1,4 @@
-﻿using EveryCupShop.Core.Enums;
+using EveryCupShop.Core.Enums;
 using EveryCupShop.Core.Exceptions;
 using EveryCupShop.Core.Interfaces.Repositories;
 using EveryCupShop.Core.Interfaces.Services;

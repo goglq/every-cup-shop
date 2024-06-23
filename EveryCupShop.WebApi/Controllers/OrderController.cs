@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using AutoMapper;
 using EveryCupShop.Core.Exceptions;
 using EveryCupShop.Core.Interfaces.Services;

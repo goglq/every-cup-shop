@@ -1,4 +1,4 @@
-﻿using EveryCupShop.Core.Models;
+using EveryCupShop.Core.Models;
 
 namespace EveryCupShop.Core.Interfaces.Services;
 

@@ -1,3 +1,3 @@
-﻿namespace EveryCupShop.Dtos;
+namespace EveryCupShop.Dtos;
 
 public record CreateOrderDto(IDictionary<Guid, int> CupIdsAmount);

@@ -1,4 +1,4 @@
-﻿using EveryCupShop.Core.Enums;
+using EveryCupShop.Core.Enums;
 
 namespace EveryCupShop.Dtos;
 
