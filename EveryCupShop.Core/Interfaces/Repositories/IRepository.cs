@@ -1,18 +1,18 @@
 ﻿namespace EveryCupShop.Core.Interfaces.Repositories;
 
-public interface IRepository<T> where T : class, IEntity
+public interface IRepository<TEntity> where TEntity : class, IEntity
 {
-    Task<IList<T>> GetAll();
+    Task<IList<TEntity>> GetAll();
 
-    Task<T> Get(Guid id);
+    Task<TEntity> Get(Guid id);
 
-    Task<T?> Find(Guid id);
+    Task<TEntity?> Find(Guid id);
     
-    Task<T> Add(T item);
+    Task<TEntity> Add(TEntity item);
 
-    void Update(T item);
+    Task<TEntity> Update(TEntity item);
 
-    Task Delete(T item);
+    Task Delete(TEntity item);
 
     Task Save();
 }
