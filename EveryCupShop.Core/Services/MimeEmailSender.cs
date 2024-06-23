@@ -21,6 +21,7 @@ public class MimeEmailSender : IEmailSender
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress(_config.SenderName, _config.SenderEmail));
         message.To.Add(new MailboxAddress(name, email));
+        message.Subject = subject;
 
         message.Body = new TextPart("html")
         {
