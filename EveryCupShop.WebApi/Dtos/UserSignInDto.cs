@@ -1,8 +1,3 @@
 ﻿namespace EveryCupShop.Dtos;
 
-public class UserSignInDto
-{
-    public string Email { get; set; }
-    
-    public string Password { get; set; }
-}
+public record UserSignInDto(string Email, string Password);
