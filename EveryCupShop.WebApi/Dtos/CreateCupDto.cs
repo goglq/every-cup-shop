@@ -1,8 +1,3 @@
 ﻿namespace EveryCupShop.Dtos;
 
-public class CreateCupDto
-{
-    public Guid CupShapeId { get; init; }
-    
-    public Guid CupAttachmentId { get; init; }
-}
+public record CreateCupDto(Guid CupShapeId, Guid CupAttachmentId);
