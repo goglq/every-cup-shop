@@ -66,9 +66,27 @@ public class CupShapeController : ControllerBase
     {
         try
         {
-            var cupShape = await _cupService.CreateShape(createCupShapeDto.Name, createCupShapeDto.Description, createCupShapeDto.Price, createCupShapeDto.Amount);
+            var cupShape = await _cupService.CreateCupShape(createCupShapeDto.Name, createCupShapeDto.Description, createCupShapeDto.Price, createCupShapeDto.Amount);
             var cupShapeViewModel = _mapper.Map<CreateCupShapeViewModel>(cupShape);
             return Ok(new ResponseMessage<CreateCupShapeViewModel>(cupShapeViewModel, true));
+        }
+        catch (ApiException e)
+        {
+            _logger.LogError(e.Message);
+            return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
+        }
+    }
+    
+    [HttpPatch]
+    public async Task<ActionResult<CupShapeViewModel>> ChangeCupAttachment(ChangeCupShapeDto changeCupShapeDto)
+    {
+        try
+        {
+            var (id, name, description, price, amount) = changeCupShapeDto;
+            var cupShape = await _cupService.ChangeCupShape(id, name, description, price, amount);
+            
+            var cupShapeViewModel = _mapper.Map<CupShapeViewModel>(cupShape);
+            return Ok(new ResponseMessage<CupShapeViewModel>(cupShapeViewModel, true));
         }
         catch (ApiException e)
         {

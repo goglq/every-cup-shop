@@ -77,6 +77,25 @@ public class CupAttachmentController : ControllerBase
             return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
         }
     }
+
+    [HttpPatch]
+    public async Task<ActionResult<CupAttachmentViewModel>> ChangeCupAttachment(ChangeCupAttachmentDto changeCupAttachmentDto)
+    {
+        try
+        {
+            var (id, name, description, price, amount) = changeCupAttachmentDto;
+            
+            var cupAttachment = await _cupService.ChangeCupAttachment(id, name, description, price, amount);
+            var cupAttachmentViewModel = _mapper.Map<CupAttachmentViewModel>(cupAttachment);
+            
+            return Ok(new ResponseMessage<CupAttachmentViewModel>(cupAttachmentViewModel, true));
+        }
+        catch (ApiException e)
+        {
+            _logger.LogError(e.Message);
+            return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
+        }
+    }
     
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult<DeleteCupAttachmentViewModel>> Delete(Guid id)
