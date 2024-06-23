@@ -50,8 +50,8 @@ public class CupController : ControllerBase
         try
         {
             var cup = await _cupService.GetCup(id);
-            var cupViewModel = _mapper.Map<IList<CupViewModel>>(cup);
-            return Ok(new ResponseMessage<IList<CupViewModel>>(cupViewModel, true));
+            var cupViewModel = _mapper.Map<CupViewModel>(cup);
+            return Ok(new ResponseMessage<CupViewModel>(cupViewModel, true));
         }
         catch (ApiException e)
         {
@@ -84,6 +84,22 @@ public class CupController : ControllerBase
             var cup = await _cupService.ChangeCup(createCupDto.CupId, createCupDto.CupShapeId, createCupDto.CupAttachmentId);
             var cupViewModel = _mapper.Map<ChangeCupViewModel>(cup);
             return Ok(new ResponseMessage<ChangeCupViewModel>(cupViewModel, true));
+        }
+        catch (ApiException e)
+        {
+            _logger.LogError(e.Message);
+            return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
+        }
+    }
+    
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult<CupViewModel>> Delete(Guid id)
+    {
+        try
+        {
+            var cup = await _cupService.DeleteCup(id);
+            var cupViewModel = _mapper.Map<CupViewModel>(cup);
+            return Ok(new ResponseMessage<CupViewModel>(cupViewModel, true));
         }
         catch (ApiException e)
         {

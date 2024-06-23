@@ -77,4 +77,20 @@ public class CupAttachmentController : ControllerBase
             return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
         }
     }
+    
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult<CupAttachmentViewModel>> Delete(Guid id)
+    {
+        try
+        {
+            var cupAttachment = await _cupService.DeleteCupAttachment(id);
+            var cupAttachmentViewModel = _mapper.Map<CupAttachmentViewModel>(cupAttachment);
+            return Ok(new ResponseMessage<CupAttachmentViewModel>(cupAttachmentViewModel, true));
+        }
+        catch (ApiException e)
+        {
+            _logger.LogError(e.Message);
+            return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
+        }
+    }
 }
