@@ -28,6 +28,38 @@ public class CupController : ControllerBase
         _cupService = cupService;
     }
 
+    [HttpGet]
+    public async Task<ActionResult<IList<CupViewModel>>> GetAll()
+    {
+        try
+        {
+            var cups = await _cupService.GetCups();
+            var cupViewModels = _mapper.Map<IList<CupViewModel>>(cups);
+            return Ok(new ResponseMessage<IList<CupViewModel>>(cupViewModels, true));
+        }
+        catch (ApiException e)
+        {
+            _logger.LogError(e.Message);
+            return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
+        }
+    }
+    
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<CupViewModel>> Get(Guid id)
+    {
+        try
+        {
+            var cup = await _cupService.GetCup(id);
+            var cupViewModel = _mapper.Map<IList<CupViewModel>>(cup);
+            return Ok(new ResponseMessage<IList<CupViewModel>>(cupViewModel, true));
+        }
+        catch (ApiException e)
+        {
+            _logger.LogError(e.Message);
+            return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
+        }
+    }
+
     [HttpPost]
     public async Task<ActionResult<CreateCupViewModel>> CreateCup(CreateCupDto createCupDto)
     {
@@ -39,7 +71,7 @@ public class CupController : ControllerBase
         }
         catch (ApiException e)
         {
-            _logger.LogInformation(e.Message);
+            _logger.LogError(e.Message);
             return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
         }
     }
@@ -55,7 +87,7 @@ public class CupController : ControllerBase
         }
         catch (ApiException e)
         {
-            _logger.LogInformation(e.Message);
+            _logger.LogError(e.Message);
             return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
         }
     }

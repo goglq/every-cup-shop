@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using EveryCupShop.Core.Exceptions;
 using EveryCupShop.Core.Interfaces.Services;
+using EveryCupShop.Core.Models;
 using EveryCupShop.Dtos;
 using EveryCupShop.Models;
 using EveryCupShop.ViewModels;
@@ -28,6 +29,39 @@ public class CupAttachmentController : ControllerBase
         _cupService = cupService;
     }
 
+    [HttpGet]
+    public async Task<ActionResult<IList<CupAttachmentViewModel>>> GetAll()
+    {
+        try
+        {
+            var cupAttachments = await _cupService.GetCupAttachments();
+            var cupAttachmentViewModels =
+                _mapper.Map<IList<CupAttachment>, IList<CupAttachmentViewModel>>(cupAttachments);
+            return Ok(new ResponseMessage<IList<CupAttachmentViewModel>>(cupAttachmentViewModels, true));
+        }
+        catch (ApiException e)
+        {
+            _logger.LogError(e.Message);
+            return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
+        }
+    }
+    
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<IList<CupAttachmentViewModel>>> Get(Guid id)
+    {
+        try
+        {
+            var cupAttachment = await _cupService.GetCupAttachment(id);
+            var cupAttachmentViewModel = _mapper.Map<CupAttachment, CupAttachmentViewModel>(cupAttachment);
+            return Ok(new ResponseMessage<CupAttachmentViewModel>(cupAttachmentViewModel, true));
+        }
+        catch (ApiException e)
+        {
+            _logger.LogError(e.Message);
+            return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
+        }
+    }
+
     [HttpPost]
     public async Task<ActionResult<CreateCupAttachmentViewModel>> CreateCupAttachment(CreateCupAttachmentDto createCupAttachmentDto)
     {
@@ -39,7 +73,7 @@ public class CupAttachmentController : ControllerBase
         }
         catch (ApiException e)
         {
-            _logger.LogInformation(e.Message);
+            _logger.LogError(e.Message);
             return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
         }
     }

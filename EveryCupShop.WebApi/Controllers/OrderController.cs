@@ -29,7 +29,39 @@ public class OrderController : ControllerBase
         _mapper = mapper;
         _orderService = orderService;
     }
+
+    [HttpGet]
+    public async Task<ActionResult<IList<OrderViewModel>>> GetAll()
+    {
+        try
+        {
+            var orders = await _orderService.GetOrders();
+            var orderViewModels = _mapper.Map<IList<OrderViewModel>>(orders);
+            return Ok(new ResponseMessage<IList<OrderViewModel>>(orderViewModels, true));
+        }
+        catch (ApiException e)
+        {
+            _logger.LogError(e.Message);
+            return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
+        }
+    }
     
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<IList<OrderViewModel>>> Get(Guid id)
+    {
+        try
+        {
+            var order = await _orderService.GetOrder(id);
+            var orderViewModel = _mapper.Map<OrderViewModel>(order);
+            return Ok(new ResponseMessage<OrderViewModel>(orderViewModel, true));
+        }
+        catch (ApiException e)
+        {
+            _logger.LogError(e.Message);
+            return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
+        }
+    }
+
     [Authorize]
     [HttpPost]
     public async Task<ActionResult<CreateOrderViewModel>> CreateOrder(CreateOrderDto createOrderDto)
@@ -50,7 +82,7 @@ public class OrderController : ControllerBase
         }
         catch (ApiException e)
         {
-            _logger.LogInformation(e.Message);
+            _logger.LogError(e.Message);
             return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
         }
     }
@@ -68,7 +100,7 @@ public class OrderController : ControllerBase
         }
         catch (ApiException e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e.Message);
             return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
         }
     }
