@@ -1,4 +1,5 @@
-﻿using EveryCupShop.Core.Interfaces.Repositories;
+﻿using EveryCupShop.Core.Exceptions;
+using EveryCupShop.Core.Interfaces.Repositories;
 using EveryCupShop.Core.Interfaces.Services;
 using EveryCupShop.Core.Models;
 
@@ -63,7 +64,7 @@ public class CupService : ICupService
 
     public async Task<Cup> ChangeCup(Guid cupId, Guid cupShapeId, Guid cupAttachmentId)
     {
-        var cup = await _cupRepository.Get(cupId);
+        var cup = await _cupRepository.Find(cupId) ?? throw new DataNotFoundException();
 
         cup.CupShapeId = cupShapeId;
         cup.CupAttachmentId = cupAttachmentId;
