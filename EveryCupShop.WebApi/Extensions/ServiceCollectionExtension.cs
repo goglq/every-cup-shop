@@ -21,7 +21,6 @@ public static class ServiceCollectionExtension
         service.AddScoped<IAuthService, AuthService>();
         
         service.AddScoped<IUserService, UserService>();
-        service.AddScoped<IAuthService, AuthService>();
         
         service.AddScoped<IOrderService, OrderService>();
         service.AddScoped<ICupService, CupService>();
