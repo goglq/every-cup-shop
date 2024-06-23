@@ -122,4 +122,21 @@ public class OrderController : ControllerBase
             return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
         }
     }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult<OrderViewModel>> Delete(Guid id)
+    {
+        try
+        {
+            var order = await _orderService.DeleteOrder(id);
+            var orderViewModel = _mapper.Map<OrderViewModel>(order);
+            
+            return Ok(new ResponseMessage<OrderViewModel>(orderViewModel, true));
+        }
+        catch (ApiException e)
+        {
+            _logger.LogInformation(e.Message);
+            return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
+        }
+    }
 }
