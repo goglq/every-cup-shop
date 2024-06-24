@@ -49,7 +49,7 @@ public class AuthService : IAuthService
 
     public async Task<(string accessToken, string refreshToken)> SignIn(string email, string password)
     {
-        var user = await _userRepository.Find(email);
+        var user = await _userRepository.Find(email, user => user.Roles);
 
         if (user is null)
         {
