@@ -13,4 +13,12 @@ public interface IUserService
     Task<User> GetUser(Guid id);
 
     Task<bool> CheckEmail(string email);
+
+    Task<User> Change(User user);
+
+    Task<User> ChangeEmail(Guid id, string email);
+
+    Task ChangePassword(Guid id, string password);
+
+    Task<User> Delete(Guid id);
 }
