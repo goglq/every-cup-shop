@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EveryCupShop.Controllers;
 
+[Authorize(Roles = "Admin")]
 [Route("[controller]")]
 [ApiController]
 public class UserController : ControllerBase
@@ -34,8 +35,7 @@ public class UserController : ControllerBase
         _mapper = mapper;
         _logger = logger;
     }
-
-    [Authorize]
+    
     [HttpGet]
     public async Task<ActionResult<IList<UserViewModel>>> GetAll()
     {
@@ -52,7 +52,6 @@ public class UserController : ControllerBase
         }
     }
     
-    [Authorize]
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<UserViewModel>> Get(Guid id)
     {
@@ -68,8 +67,7 @@ public class UserController : ControllerBase
             return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
         }
     }
-
-    [Authorize]
+    
     [HttpPost]
     public async Task<ActionResult<CreateUserViewModel>> Create(CreateUserDto userDto)
     {
@@ -91,8 +89,7 @@ public class UserController : ControllerBase
             return BadRequest(new ResponseMessage<ProblemDetails>(null, false, e.Message));
         }
     }
-
-    [Authorize]
+    
     [HttpPatch]
     public async Task<ActionResult> ChangeEmail(ChangeUserEmailDto dto)
     {
@@ -110,7 +107,6 @@ public class UserController : ControllerBase
         }
     }
     
-    [Authorize]
     [HttpPatch]
     public async Task<ActionResult> ChangeEmail(ChangeUserPasswordDto dto)
     {
@@ -126,8 +122,7 @@ public class UserController : ControllerBase
             return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
         }
     }
-
-    [Authorize]
+    
     [HttpPut]
     public async Task<ActionResult> ChangeUser(ChangeUserDto dto)
     {
@@ -144,8 +139,7 @@ public class UserController : ControllerBase
             return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
         }
     }
-
-    [Authorize]
+    
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult> Delete(Guid id)
     {
@@ -162,6 +156,7 @@ public class UserController : ControllerBase
         }
     }
 
+    [AllowAnonymous]
     [HttpGet("check-email")]
     public async Task<ActionResult<bool>> Check(string email)
     {
