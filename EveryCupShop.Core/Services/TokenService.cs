@@ -34,7 +34,7 @@ public class TokenService : ITokenService
 
         if (token is null) throw new ApiUnauthorizedException();
 
-        var user = await _userRepository.Find(token.UserId);
+        var user = await _userRepository.Find(token.UserId, user => user.Roles);
 
         if (user is null) throw new UserNotFoundException();
 
