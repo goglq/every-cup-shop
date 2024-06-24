@@ -1,4 +1,5 @@
-﻿using EveryCupShop.Core.Interfaces.Repositories;
+﻿using System.Linq.Expressions;
+using EveryCupShop.Core.Interfaces.Repositories;
 using EveryCupShop.Core.Models;
 using EveryCupShop.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
@@ -11,9 +12,9 @@ public class UserEfRepository : EfRepository<User>, IUserRepository
     {
     }
 
-    public Task<User> Get(string email) =>
-        Entities.FirstAsync(user => user.Email == email);
+    public Task<User> Get(string email, params Expression<Func<User, object>>[] includes) =>
+        GetQueryWithIncludes(includes).FirstAsync(user => user.Email == email);
 
-    public Task<User?> Find(string email) =>
-        Entities.FirstOrDefaultAsync(user => user.Email == email);
+    public Task<User?> Find(string email, params Expression<Func<User, object>>[] includes) =>
+        GetQueryWithIncludes(includes).FirstOrDefaultAsync(user => user.Email == email);
 }
