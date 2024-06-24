@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Linq.Expressions;
+using System.Text.Json;
 using EveryCupShop.Core.Interfaces;
 using EveryCupShop.Core.Interfaces.Repositories;
 using Microsoft.Extensions.Caching.Distributed;
@@ -36,7 +37,7 @@ public abstract class CachingEfRepository<TRepository, TEntity> : IRepository<TE
 
     protected void InvalidateCache(string? key = null) => Cache.Remove(CacheKey(key));
 
-    public async Task<IList<TEntity>> GetAll()
+    public async Task<IList<TEntity>> GetAll(params Expression<Func<TEntity, object>>[] includes)
     {
         var key = CacheKey();
         var cachedItems = await FindCachedItem<IList<TEntity>>(key);
@@ -44,7 +45,7 @@ public abstract class CachingEfRepository<TRepository, TEntity> : IRepository<TE
         if (cachedItems is not null)
             return cachedItems;
 
-        var items = await Repository.GetAll();
+        var items = await Repository.GetAll(includes);
 
         if (items.Count > 0)
             await Cache.SetStringAsync(key, JsonSerializer.Serialize(items), Options);
@@ -52,7 +53,7 @@ public abstract class CachingEfRepository<TRepository, TEntity> : IRepository<TE
         return items;
     }
 
-    public async Task<TEntity> Get(Guid id)
+    public async Task<TEntity> Get(Guid id, params Expression<Func<TEntity, object>>[] includes)
     {
         var key = CacheKey(id.ToString());
         var cachedItem = await FindCachedItem<TEntity>(key);
@@ -60,14 +61,14 @@ public abstract class CachingEfRepository<TRepository, TEntity> : IRepository<TE
         if (cachedItem is not null)
             return cachedItem;
 
-        var item = await Repository.Get(id);
+        var item = await Repository.Get(id, includes);
 
         await Cache.SetStringAsync(key, JsonSerializer.Serialize(item), Options);
 
         return item;
     }
 
-    public async Task<TEntity?> Find(Guid id)
+    public async Task<TEntity?> Find(Guid id, params Expression<Func<TEntity, object>>[] includes)
     {
         var key = CacheKey(id.ToString());
         var cachedItem = await FindCachedItem<TEntity>(key);
@@ -75,7 +76,7 @@ public abstract class CachingEfRepository<TRepository, TEntity> : IRepository<TE
         if (cachedItem is not null)
             return cachedItem;
 
-        var item = await Repository.Find(id);
+        var item = await Repository.Find(id, includes);
 
         if (item is not null)
             await Cache.SetStringAsync(key, JsonSerializer.Serialize(item), Options);

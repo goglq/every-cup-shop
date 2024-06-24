@@ -4,7 +4,7 @@ using Microsoft.Extensions.Caching.Distributed;
 
 namespace EveryCupShop.Infrastructure.Repositories.CacheRepository;
 
-public class OrderCachingEfRepository : CachingEfRepository<OrderEfRepository, Order>, IOrderRepository
+public class OrderCachingEfRepository : CachingEfRepository<IOrderRepository, Order>, IOrderRepository
 {
-    public OrderCachingEfRepository(OrderEfRepository repository, IDistributedCache cache) : base(repository, cache) { }
+    public OrderCachingEfRepository(IOrderRepository repository, IDistributedCache cache) : base(repository, cache) { }
 }
