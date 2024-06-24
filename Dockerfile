@@ -16,4 +16,3 @@ COPY --from=build /app ./
 EXPOSE 80
 
 ENTRYPOINT ["dotnet", "EveryCupShop.WebApi.dll"]
-CMD ["dotnet", "ef", "database", "update", "--project", "EveryCupShop.Infrastructure", "--startup-project", "EveryCupShop.WebApi"]
