@@ -4,6 +4,7 @@ using EveryCupShop.Core.Models;
 using EveryCupShop.Core.Services;
 using EveryCupShop.Dtos;
 using EveryCupShop.Infrastructure.Repositories;
+using EveryCupShop.Infrastructure.Repositories.CacheRepository;
 using EveryCupShop.MappingProfiles;
 using EveryCupShop.Validators;
 using FluentValidation;
@@ -55,6 +56,8 @@ public static class ServiceCollectionExtension
         
         service.AddScoped<IOrderRepository, OrderEfRepository>();
         service.AddScoped<IOrderItemRepository, OrderItemEfRepository>();
+        
+        service.AddScoped<IUserCachingRepository, UserCachingEfRepository>();
     }
 
     public static void AddAppMapperProfiles(this IServiceCollection service)
