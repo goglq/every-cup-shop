@@ -24,6 +24,13 @@ try
             options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
     builder.Services
+        .AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = builder.Configuration.GetConnectionString("Redis");
+            options.InstanceName = "every-cup-shop";
+        });
+
+    builder.Services
         .AddControllers();
 
     builder.Services
