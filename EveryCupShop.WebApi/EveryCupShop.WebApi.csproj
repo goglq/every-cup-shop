@@ -9,10 +9,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Middlewares\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\EveryCupShop.Infrastructure\EveryCupShop.Infrastructure.csproj" />
     </ItemGroup>
 
@@ -26,6 +22,10 @@
       <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
       <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
       <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Middlewares\" />
     </ItemGroup>
 
 </Project>

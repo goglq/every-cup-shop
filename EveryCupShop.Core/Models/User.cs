@@ -11,4 +11,8 @@ public class User : IEntity
     public string Password { get; set; }
     
     public Token Token { get; set; }
+    
+    public IList<Order> Orders { get; set; }
+    
+    public IList<Role> Roles { get; set; }
 }

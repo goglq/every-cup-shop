@@ -1,5 +1,6 @@
 using EveryCupShop.Extensions;
 using EveryCupShop.Infrastructure.Database;
+using EveryCupShop.Middlewares;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
@@ -23,7 +24,19 @@ try
             options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
     builder.Services
+        .AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = builder.Configuration.GetConnectionString("Redis");
+            options.InstanceName = "every-cup-shop";
+        });
+
+    builder.Services
         .AddControllers();
+
+    builder.Services
+        .AddHttpContextAccessor();
+
+    builder.SetupEmailConfig();
     
     builder.SetupCors();
     builder.SetupJwt();
@@ -36,11 +49,18 @@ try
     var app = builder.Build();
     Log.Information("Server finished building");
 
-    app.UseCors("Default");
-    
+    // app.UseHttpsRedirection();
+    app.UseMiddleware<LoggerMiddleware>();
     app.UseSerilogRequestLogging();
     
+    app.UseCors("Default");
+
+    app.UseAuthentication();
+    app.UseAuthorization();
+
     app.MapControllers();
+
+    app.Migrate();
 
     Log.Information("Server is running");
     app.Run();

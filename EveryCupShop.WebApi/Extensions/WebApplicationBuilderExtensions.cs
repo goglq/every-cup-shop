@@ -7,6 +7,12 @@ namespace EveryCupShop.Extensions;
 
 public static class WebApplicationBuilderExtensions
 {
+    public static void SetupEmailConfig(this WebApplicationBuilder builder)
+    {
+        var smtpEmailConfigSection = builder.Configuration.GetSection(nameof(SmtpEmailSenderConfig));
+        builder.Services.Configure<SmtpEmailSenderConfig>(smtpEmailConfigSection);
+    }
+    
     public static void SetupCors(this WebApplicationBuilder builder)
     {
         var corsConfig = builder.Configuration.GetSection(nameof(CorsConfig)).Get<CorsConfig>();

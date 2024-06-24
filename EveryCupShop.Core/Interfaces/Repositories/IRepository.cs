@@ -1,18 +1,20 @@
-﻿namespace EveryCupShop.Core.Interfaces.Repositories;
+﻿using System.Linq.Expressions;
 
-public interface IRepository<T> where T : class, IEntity
+namespace EveryCupShop.Core.Interfaces.Repositories;
+
+public interface IRepository<TEntity> where TEntity : class, IEntity
 {
-    Task<IList<T>> GetAll();
+    Task<IList<TEntity>> GetAll(params Expression<Func<TEntity, object>>[] includes);
 
-    Task<T> Get(Guid id);
+    Task<TEntity> Get(Guid id, params Expression<Func<TEntity, object>>[] includes);
 
-    Task<T?> Find(Guid id);
+    Task<TEntity?> Find(Guid id, params Expression<Func<TEntity, object>>[] includes);
     
-    Task<T> Add(T item);
+    Task<TEntity> Add(TEntity item);
 
-    void Update(T item);
+    Task<TEntity> Update(TEntity item);
 
-    void Delete(T item);
+    Task Delete(TEntity item);
 
     Task Save();
 }

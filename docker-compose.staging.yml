@@ -1,0 +1,59 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres
+    container_name: postgres_container
+    restart: always
+    environment:
+      POSTGRES_DB: every-cup-shop
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      POSTGRES_USER_FILE: /run/secrets/postgres_user
+    secrets:
+      - postgres_user
+      - postgres_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-staging-data:/var/lib/postgresql/data
+    networks:
+      - app-staging-network
+
+  redis:
+    image: "redis:latest"
+    container_name: redis_container
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-staging-data:/data
+    networks:
+      - app-staging-network
+  
+  app:
+    image: "purps/every-cup-shop:v1"
+    ports:
+      - "80:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Staging
+      - ConnectionStrings:Default=Host=postgres_container;Port=5432;Database=every-cup-shop;Username=${PG_USER};Password=${PG_PASSWORD}
+      - ConnectionStrings:Redis=redis_container
+      - AccessJwtConfig:SigningKey=${ACCESS_SIGNING_KEY}
+      - RefreshJwtConfig:SigningKey=${REFRESH_SIGNING_KEY}
+      - SmtpEmailSenderConfig:Username=${SMTP_USERNAME}
+      - SmtpEmailSenderConfig:Password=${SMTP_PASSWORD}
+    networks:
+      - app-staging-network
+
+networks:
+  app-staging-network:
+    driver: bridge
+
+volumes: 
+  postgres-staging-data:
+  redis-staging-data:
+
+secrets:
+  postgres_user:
+    file: ./secrets/postgres_user.txt
+  postgres_password:
+    file: ./secrets/postgres_password.txt

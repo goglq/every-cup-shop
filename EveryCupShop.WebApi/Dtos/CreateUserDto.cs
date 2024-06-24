@@ -1,8 +1,3 @@
 ﻿namespace EveryCupShop.Dtos;
 
-public class CreateUserDto
-{
-    public string Email { get; set; }
-    
-    public string Password { get; set; }
-}
+public record CreateUserDto(string Email, string Password);

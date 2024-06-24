@@ -3,16 +3,16 @@ using FluentValidation;
 
 namespace EveryCupShop.Validators;
 
-public class UserLoginDtoValidator : AbstractValidator<UserLoginDto>
+public class UserSignUpDtoValidator : AbstractValidator<UserSignUpDto>
 {
-    public UserLoginDtoValidator()
+    public UserSignUpDtoValidator()
     {
         RuleFor(dto => dto.Email)
             .NotEmpty()
             .WithMessage("Email is required")
             .EmailAddress()
-            .WithMessage("Invalid email");
-        
+            .WithMessage("Invalid email format");
+
         RuleFor(dto => dto.Password)
             .NotEmpty()
             .WithMessage("Password is required");

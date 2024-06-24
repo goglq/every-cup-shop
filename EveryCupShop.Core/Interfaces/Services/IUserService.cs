@@ -14,7 +14,11 @@ public interface IUserService
 
     Task<bool> CheckEmail(string email);
 
-    Task<(string accessToken, string refreshToken)> SignIn(string email, string password);
+    Task<User> Change(User user);
 
-    Task SignUp(string email, string password);
+    Task<User> ChangeEmail(Guid id, string email);
+
+    Task ChangePassword(Guid id, string password);
+
+    Task<User> Delete(Guid id);
 }

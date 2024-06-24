@@ -1,4 +1,5 @@
-﻿using EveryCupShop.Core.Exceptions;
+﻿using System.Linq.Expressions;
+using EveryCupShop.Core.Exceptions;
 using EveryCupShop.Core.Interfaces;
 using EveryCupShop.Core.Interfaces.Repositories;
 using EveryCupShop.Infrastructure.Database;
@@ -18,14 +19,24 @@ public abstract class EfRepository<TEntity> : IRepository<TEntity> where TEntity
         _context = context;
     }
 
-    public async Task<IList<TEntity>> GetAll() => 
-        await Entities.ToListAsync();
+    protected IQueryable<TEntity> GetQueryWithIncludes(IReadOnlyCollection<Expression<Func<TEntity, object>>> includes) =>
+        includes.Count > 0 
+            ? includes
+                .Aggregate<Expression<Func<TEntity, object>>, IQueryable<TEntity>>(
+                    Entities, 
+                    (current, include) => current.Include(include))
+            : Entities;
 
-    public Task<TEntity> Get(Guid id) =>
-        Entities.FirstAsync(item => item.Id == id);
+    public async Task<IList<TEntity>> GetAll(params Expression<Func<TEntity, object>>[] includes)
+    {
+        return await GetQueryWithIncludes(includes).ToListAsync();
+    }
 
-    public Task<TEntity?> Find(Guid id) =>
-        Entities.FirstOrDefaultAsync(item => item.Id == id);
+    public Task<TEntity> Get(Guid id, params Expression<Func<TEntity, object>>[] includes) =>
+        GetQueryWithIncludes(includes).FirstAsync(item => item.Id == id);
+
+    public Task<TEntity?> Find(Guid id, params Expression<Func<TEntity, object>>[] includes) =>
+        GetQueryWithIncludes(includes).FirstOrDefaultAsync(item => item.Id == id);
 
     public async Task<TEntity> Add(TEntity item)
     {
@@ -34,11 +45,18 @@ public abstract class EfRepository<TEntity> : IRepository<TEntity> where TEntity
         return entry.Entity;
     }
 
-    public void Update(TEntity item) => 
-        _context.Entry(item).State = EntityState.Modified;
-
-    public void Delete(TEntity item) =>
+    public Task<TEntity> Update(TEntity item)
+    {
+        var entry = _context.Entry(item);
+        entry.State = EntityState.Modified;
+        return Task.FromResult(entry.Entity);
+    }
+    
+    public Task Delete(TEntity item)
+    {
         Entities.Remove(item);
+        return Task.CompletedTask;;
+    }
 
     public Task Save() =>
         _context.SaveChangesAsync();

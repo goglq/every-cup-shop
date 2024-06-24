@@ -6,53 +6,70 @@ using EveryCupShop.Dtos;
 using EveryCupShop.Models;
 using EveryCupShop.ViewModels;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 
 namespace EveryCupShop.Controllers;
 
+[Authorize(Roles = "Admin")]
 [Route("[controller]")]
 [ApiController]
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
 
-    private readonly ITokenService _tokenService;
-
     private readonly IMapper _mapper;
 
     private readonly IValidator<CreateUserDto> _createUserValidator;
-    
-    private readonly IValidator<UserLoginDto> _userLoginValidator;
 
     private readonly ILogger<UserController> _logger;
-    
-    public UserController(IUserService userService, ITokenService tokenService, IValidator<CreateUserDto> createUserValidator, IValidator<UserLoginDto> userLoginValidator, IMapper mapper, ILogger<UserController> logger)
+
+    public UserController(
+        IUserService userService,
+        IValidator<CreateUserDto> createUserValidator,
+        IMapper mapper, 
+        ILogger<UserController> logger)
     {
         _userService = userService;
-        _tokenService = tokenService;
         _createUserValidator = createUserValidator;
-        _userLoginValidator = userLoginValidator;
         _mapper = mapper;
         _logger = logger;
     }
-
+    
     [HttpGet]
-    public async Task<ActionResult<IList<User>>> GetAll()
+    public async Task<ActionResult<IList<UserViewModel>>> GetAll()
     {
-        var users = await _userService.GetUsers();
-        return Ok(users);
+        try
+        {
+            var users = await _userService.GetUsers();
+            var userViewModels = _mapper.Map<IList<UserViewModel>>(users);
+            return Ok(new ResponseMessage<IList<UserViewModel>>(userViewModels, true));
+        }
+        catch (ApiException e)
+        {
+            _logger.LogError(e.Message);
+            return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
+        }
     }
-
+    
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<User>> Get(Guid id)
+    public async Task<ActionResult<UserViewModel>> Get(Guid id)
     {
-        var user = await _userService.GetUser(id);
-        return Ok(user);
+        try
+        {
+            var user = await _userService.GetUser(id);
+            var userViewModel = _mapper.Map<UserViewModel>(user);
+            return Ok(new ResponseMessage<UserViewModel>(userViewModel, true));
+        }
+        catch (ApiException e)
+        {
+            _logger.LogError(e.Message);
+            return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
+        }
     }
-
+    
     [HttpPost]
-    public async Task<ActionResult<User>> Create(CreateUserDto userDto)
+    public async Task<ActionResult<CreateUserViewModel>> Create(CreateUserDto userDto)
     {
         try
         {
@@ -72,29 +89,74 @@ public class UserController : ControllerBase
             return BadRequest(new ResponseMessage<ProblemDetails>(null, false, e.Message));
         }
     }
-
-    [HttpPost("sign-in")]
-    public async Task<ActionResult<TokensViewModel>> SignIn(UserLoginDto userLoginDto)
+    
+    [HttpPatch]
+    public async Task<ActionResult> ChangeEmail(ChangeUserEmailDto dto)
     {
         try
         {
-            var validationResult = await _userLoginValidator.ValidateAsync(userLoginDto);
-
-            if (!validationResult.IsValid)
-                throw new ApiValidationException();
-
-            var tokens = await _userService.SignIn(userLoginDto.Email, userLoginDto.Password);
-            var tokensViewModel = _mapper.Map<TokensViewModel>(tokens);
-
-            return Ok(new ResponseMessage<TokensViewModel>(tokensViewModel, true, "Successfully signed in"));
+            var (id, email) = dto;
+            var updatedUser = await _userService.ChangeEmail(id, email);
+            var updatedUserViewModel = _mapper.Map<ChangeUserEmailViewModel>(updatedUser);
+            return Ok(new ResponseMessage<ChangeUserEmailViewModel>(updatedUserViewModel, true));
         }
         catch (ApiException e)
         {
             _logger.LogError(e.Message);
-            return Unauthorized(new ResponseMessage<ProblemDetails>(null, false, e.Message));
+            return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
+        }
+    }
+    
+    [HttpPatch]
+    public async Task<ActionResult> ChangeEmail(ChangeUserPasswordDto dto)
+    {
+        try
+        {
+            var (id, password) = dto;
+            await _userService.ChangePassword(id, password);
+            return Ok(new ResponseMessage<ChangeUserPasswordViewModel>(null, true));
+        }
+        catch (ApiException e)
+        {
+            _logger.LogError(e.Message);
+            return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
+        }
+    }
+    
+    [HttpPut]
+    public async Task<ActionResult> ChangeUser(ChangeUserDto dto)
+    {
+        try
+        {
+            var user = _mapper.Map<User>(dto);
+            var updatedUser = await _userService.Change(user);
+            var updatedUserViewModel = _mapper.Map<UserViewModel>(updatedUser);
+            return Ok(new ResponseMessage<UserViewModel>(updatedUserViewModel, true));
+        }
+        catch (ApiException e)
+        {
+            _logger.LogError(e.Message);
+            return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
+        }
+    }
+    
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult> Delete(Guid id)
+    {
+        try
+        {
+            var deletedUser = await _userService.Delete(id);
+            var deletedUserViewModel = _mapper.Map<UserViewModel>(deletedUser);
+            return Ok(new ResponseMessage<UserViewModel>(deletedUserViewModel, true));
+        }
+        catch (ApiException e)
+        {
+            _logger.LogError(e.Message);
+            return BadRequest(new ResponseMessage<ProblemDetails>(null, false));
         }
     }
 
+    [AllowAnonymous]
     [HttpGet("check-email")]
     public async Task<ActionResult<bool>> Check(string email)
     {
@@ -108,22 +170,6 @@ public class UserController : ControllerBase
         {
             _logger.LogError(e.Message);
             return BadRequest(new ResponseMessage<ProblemDetails>(null, false, e.Message));
-        }
-    }
-
-    [HttpPost("refresh-tokens")]
-    public async Task<ActionResult<TokensViewModel>> RefreshToken(RefreshTokenDto refreshTokenDto)
-    {
-        try
-        {
-            var tokens = await _tokenService.RefreshTokens(refreshTokenDto.RefreshToken);
-            var tokensViewModel = _mapper.Map<TokensViewModel>(tokens);
-            return Ok(new ResponseMessage<TokensViewModel>(tokensViewModel, true));
-        }
-        catch (ApiException e)
-        {
-            _logger.LogError(e.Message);
-            return Unauthorized(new ResponseMessage<ProblemDetails>(null, false, e.Message));
         }
     }
 }

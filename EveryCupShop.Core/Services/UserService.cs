@@ -2,35 +2,35 @@
 using EveryCupShop.Core.Interfaces.Repositories;
 using EveryCupShop.Core.Interfaces.Services;
 using EveryCupShop.Core.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace EveryCupShop.Core.Services;
 
 public class UserService : IUserService
 {
-    private readonly IUserRepository _userRepository;
+    private readonly IUserCachingRepository _userCachingRepository;
 
-    private readonly ITokenService _tokenService;
+    private readonly IPasswordHasher<User> _passwordHasher;
 
-    private readonly ITokenRepository _tokenRepository;
-
-    public UserService(ITokenService tokenService, IUserRepository userRepository, ITokenRepository tokenRepository)
+    public UserService(
+        IUserCachingRepository userCachingCachingRepository,
+        IPasswordHasher<User> passwordHasher)
     {
-        _userRepository = userRepository;
-        _tokenRepository = tokenRepository;
-        _tokenService = tokenService;
+        _userCachingRepository = userCachingCachingRepository;
+        _passwordHasher = passwordHasher;
     }
 
     public async Task<User> CreateUser(string email, string password)
     {
         try
         {
-            var user = await _userRepository.Add(new User()
+            var user = await _userCachingRepository.Add(new User()
             {
                 Email = email,
                 Password = password
             });
 
-            await _userRepository.Save();
+            await _userCachingRepository.Save();
 
             return user;
         }
@@ -42,81 +42,77 @@ public class UserService : IUserService
 
     public async Task<IList<User>> GetUsers()
     {
-        var users = await _userRepository.GetAll();
+        var users = await _userCachingRepository.GetAll();
 
         return users;
     }
 
     public async Task<User> GetUser(string email)
     {
-        var user = await _userRepository.Get(email);
+        var user = await _userCachingRepository.Get(email);
 
         return user;
     }
     
     public async Task<User> GetUser(Guid id)
     {
-        var user = await _userRepository.Get(id);
+        var user = await _userCachingRepository.Get(id);
 
         return user;
     }
 
     public async Task<bool> CheckEmail(string email)
     {
-        var user = await _userRepository.Find(email);
+        var user = await _userCachingRepository.Find(email);
 
         return user is not null;
     }
 
-    public async Task<(string accessToken, string refreshToken)> SignIn(string email, string password)
+    public async Task<User> Change(User user)
     {
-        var user = await _userRepository.Find(email);
+        user.Password = _passwordHasher.HashPassword(user, user.Password);
 
-        if (user is null)
-        {
-            throw new UserNotFoundException();
-        }
+        await _userCachingRepository.Update(user);
+        await _userCachingRepository.Save();
 
-        var tokens = _tokenService.GenerateTokens(user);
-
-        var token = await _tokenRepository.FindByUserId(user.Id);
-
-        if (token is null)
-        {
-            await _tokenRepository.Add(new Token()
-            {
-                RefreshToken = tokens.refreshToken,
-                UserId = user.Id
-            });
-        }
-        else
-        {
-            token.RefreshToken = tokens.refreshToken;
-            _tokenRepository.Update(token);
-        }
-
-        await _tokenRepository.Save();
-
-        return tokens;
+        return user;
     }
 
-    public async Task SignUp(string email, string password)
+    public async Task<User> ChangeEmail(Guid id, string email)
     {
-        var candidate = await _userRepository.Find(email);
+        var user = await _userCachingRepository.Find(id);
 
-        if (candidate is not null)
-        {
-            throw new EmailIsTakenException();
-        }
+        if (user is null)
+            throw new UserNotFoundException();
 
-        var newUser = new User
-        {
-            Email = email,
-            Password = password
-        };
+        user.Email = email;
 
-        await _userRepository.Add(newUser);
+        await _userCachingRepository.Update(user);
+        await _userCachingRepository.Save();
 
-        await _userRepository.Save();
+        return user;
+    }
+
+    public async Task ChangePassword(Guid id, string password)
+    {
+        var user = await _userCachingRepository.Find(id);
+
+        if (user is null)
+            throw new UserNotFoundException();
+
+        user.Password = _passwordHasher.HashPassword(user, password);
+    }
+
+    public async Task<User> Delete(Guid id)
+    {
+        var user = await _userCachingRepository.Find(id);
+
+        if (user is null)
+            throw new UserNotFoundException();
+
+        await _userCachingRepository.Delete(user);
+        await _userCachingRepository.Save();
+
+        return user;
     }
 }
