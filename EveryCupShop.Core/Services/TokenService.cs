@@ -54,12 +54,14 @@ public class TokenService : ITokenService
 
     private string Generate(User user, JwtConfig config)
     {
-        var claims = new[]
+        var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new (JwtRegisteredClaimNames.NameId, user.Id.ToString()),
+            new (JwtRegisteredClaimNames.Email, user.Email),
+            new (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
+
+        claims.AddRange(user.Roles.Select(role => new Claim(ClaimTypes.Role, role.Name)));
 
         var key = new SymmetricSecurityKey(config.SigningKeyBytes);
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
