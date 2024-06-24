@@ -24,6 +24,8 @@ public class AuthService : IAuthService
 
     private readonly ITokenRepository _tokenRepository;
 
+    private readonly IRoleRepository _roleRepository;
+
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     private readonly IPasswordHasher<User> _passwordHasher;
@@ -31,13 +33,15 @@ public class AuthService : IAuthService
     public AuthService(
         ITokenService tokenService, 
         IUserRepository userRepository, 
-        ITokenRepository tokenRepository, 
+        ITokenRepository tokenRepository,
+        IRoleRepository roleRepository,
         IHttpContextAccessor httpContextAccessor, 
         IPasswordHasher<User> passwordHasher)
     {
         _tokenService = tokenService;
         _userRepository = userRepository;
         _tokenRepository = tokenRepository;
+        _roleRepository = roleRepository;
         _httpContextAccessor = httpContextAccessor;
         _passwordHasher = passwordHasher;
     }
@@ -45,7 +49,7 @@ public class AuthService : IAuthService
 
     public async Task<(string accessToken, string refreshToken)> SignIn(string email, string password)
     {
-        var user = await _userRepository.Find(email);
+        var user = await _userRepository.Find(email, user => user.Roles);
 
         if (user is null)
         {
@@ -89,9 +93,15 @@ public class AuthService : IAuthService
         if (candidate is not null)
             throw new EmailIsTakenException();
 
+        var userRole = await _roleRepository.Get("User");
+        
         var newUser = new User
         {
-            Email = email
+            Email = email,
+            Roles = new List<Role>
+            {
+                userRole
+            }  
         };
 
         var hashedPassword = _passwordHasher.HashPassword(newUser, password);

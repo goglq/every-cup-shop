@@ -13,4 +13,6 @@ public class User : IEntity
     public Token Token { get; set; }
     
     public IList<Order> Orders { get; set; }
+    
+    public IList<Role> Roles { get; set; }
 }

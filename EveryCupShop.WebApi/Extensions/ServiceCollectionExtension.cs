@@ -19,6 +19,7 @@ public static class ServiceCollectionExtension
         
         service.AddScoped<ITokenService, TokenService>();
         service.AddScoped<IAuthService, AuthService>();
+        service.AddScoped<IRoleService, RoleService>();
         
         service.AddScoped<IUserService, UserService>();
         
@@ -46,6 +47,7 @@ public static class ServiceCollectionExtension
     {
         service.AddScoped<IUserRepository, UserEfRepository>();
         service.AddScoped<ITokenRepository, TokenEfRepository>();
+        service.AddScoped<IRoleRepository, RoleEfRepository>();
         
         service.AddScoped<ICupRepository, CupEfRepository>();
         service.AddScoped<ICupShapeRepository, CupShapeEfRepository>();
