@@ -60,6 +60,8 @@ try
 
     app.MapControllers();
 
+    app.Migrate();
+
     Log.Information("Server is running");
     app.Run();
 }
