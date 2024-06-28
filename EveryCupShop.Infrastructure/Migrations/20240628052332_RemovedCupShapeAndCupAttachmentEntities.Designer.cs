@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EveryCupShop.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240628044605_AddedCupsToDbContext")]
-    partial class AddedCupsToDbContext
+    [Migration("20240628052332_RemovedCupShapeAndCupAttachmentEntities")]
+    partial class RemovedCupShapeAndCupAttachmentEntities
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,69 +31,23 @@ namespace EveryCupShop.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("CupAttachmentId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("Amount")
+                        .HasColumnType("integer");
 
-                    b.Property<Guid>("CupShapeId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CupAttachmentId");
-
-                    b.HasIndex("CupShapeId");
 
                     b.ToTable("Cups");
-                });
-
-            modelBuilder.Entity("EveryCupShop.Core.Models.CupAttachment", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Amount")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("numeric");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CupAttachments");
-                });
-
-            modelBuilder.Entity("EveryCupShop.Core.Models.CupShape", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Amount")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("numeric");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CupShapes");
                 });
 
             modelBuilder.Entity("EveryCupShop.Core.Models.Order", b =>
@@ -236,25 +190,6 @@ namespace EveryCupShop.Infrastructure.Migrations
                     b.ToTable("RoleUser");
                 });
 
-            modelBuilder.Entity("EveryCupShop.Core.Models.Cup", b =>
-                {
-                    b.HasOne("EveryCupShop.Core.Models.CupAttachment", "CupAttachment")
-                        .WithMany("Cups")
-                        .HasForeignKey("CupAttachmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EveryCupShop.Core.Models.CupShape", "CupShape")
-                        .WithMany("Cups")
-                        .HasForeignKey("CupShapeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CupAttachment");
-
-                    b.Navigation("CupShape");
-                });
-
             modelBuilder.Entity("EveryCupShop.Core.Models.Order", b =>
                 {
                     b.HasOne("EveryCupShop.Core.Models.User", "User")
@@ -309,16 +244,6 @@ namespace EveryCupShop.Infrastructure.Migrations
                         .HasForeignKey("UsersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("EveryCupShop.Core.Models.CupAttachment", b =>
-                {
-                    b.Navigation("Cups");
-                });
-
-            modelBuilder.Entity("EveryCupShop.Core.Models.CupShape", b =>
-                {
-                    b.Navigation("Cups");
                 });
 
             modelBuilder.Entity("EveryCupShop.Core.Models.Order", b =>
