@@ -10,14 +10,10 @@ public class CupEntityConfig : IEntityTypeConfiguration<Cup>
     {
         builder.HasKey(cup => cup.Id);
 
-        builder
-            .HasOne(cup => cup.CupShape)
-            .WithMany(shape => shape.Cups)
-            .HasForeignKey(cup => cup.CupShapeId);
+        builder.Property(cup => cup.Name)
+            .IsRequired();
 
-        builder
-            .HasOne(cup => cup.CupAttachment)
-            .WithMany(attachment => attachment.Cups)
-            .HasForeignKey(cup => cup.CupAttachmentId);
+        builder.Property(cup => cup.Price)
+            .IsRequired();
     }
 }

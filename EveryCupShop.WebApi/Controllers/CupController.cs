@@ -65,7 +65,7 @@ public class CupController : ControllerBase
     {
         try
         {
-            var cup = await _cupService.CreateCup(createCupDto.CupShapeId, createCupDto.CupAttachmentId);
+            var cup = await _cupService.CreateCup(createCupDto.Name, createCupDto.Description, createCupDto.Price, createCupDto.Amount);
             var cupViewModel = _mapper.Map<CreateCupViewModel>(cup);
             return Ok(new ResponseMessage<CreateCupViewModel>(cupViewModel, true));
         }
@@ -81,9 +81,9 @@ public class CupController : ControllerBase
     {
         try
         {
-            var (cupId, cupShapeId, cupAttachmentId) = createCupDto;
+            var (cupId, name, description, price, amount) = createCupDto;
             
-            var cup = await _cupService.ChangeCup(cupId, cupShapeId, cupAttachmentId);
+            var cup = await _cupService.ChangeCup(cupId, name, description, price, amount);
             var cupViewModel = _mapper.Map<ChangeCupViewModel>(cup);
             
             return Ok(new ResponseMessage<ChangeCupViewModel>(cupViewModel, true));
