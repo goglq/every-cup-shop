@@ -1,3 +1,4 @@
+using EveryCupShop;
 using EveryCupShop.Extensions;
 using EveryCupShop.Infrastructure.Database;
 using EveryCupShop.Middlewares;
@@ -41,6 +42,8 @@ try
     builder.SetupCors();
     builder.SetupJwt();
 
+    builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+    
     builder.Services.AddAppRepositories();
     builder.Services.AddAppServices();
     builder.Services.AddAppValidation();
@@ -49,7 +52,9 @@ try
     var app = builder.Build();
     Log.Information("Server finished building");
 
-    // app.UseHttpsRedirection();
+    app.UseExceptionHandler(_ => {});
+    
+    app.UseHttpsRedirection();
     app.UseMiddleware<LoggerMiddleware>();
     app.UseSerilogRequestLogging();
     
