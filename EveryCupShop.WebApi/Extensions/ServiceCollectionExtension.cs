@@ -51,8 +51,6 @@ public static class ServiceCollectionExtension
         service.AddScoped<IRoleRepository, RoleEfRepository>();
         
         service.AddScoped<ICupRepository, CupEfRepository>();
-        service.AddScoped<ICupShapeRepository, CupShapeEfRepository>();
-        service.AddScoped<ICupAttachmentRepository, CupAttachmentEfRepository>();
         
         service.AddScoped<IOrderRepository, OrderEfRepository>();
         service.AddScoped<IOrderItemRepository, OrderItemEfRepository>();

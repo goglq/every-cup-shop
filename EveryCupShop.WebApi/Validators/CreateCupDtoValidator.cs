@@ -7,12 +7,12 @@ public class CreateCupDtoValidator : AbstractValidator<CreateCupDto>
 {
     public CreateCupDtoValidator()
     {
-        RuleFor(dto => dto.CupShapeId)
+        RuleFor(dto => dto.Name)
             .NotEmpty()
-            .WithMessage("Cup shape id is required");
+            .WithMessage("Name is required");
         
-        RuleFor(dto => dto.CupAttachmentId)
-            .NotEmpty()
-            .WithMessage("Cup attachment id is required");
+        RuleFor(dto => dto.Price)
+            .NotNull()
+            .WithMessage("Price is required");
     }
 }

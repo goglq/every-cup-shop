@@ -1,3 +1,3 @@
 namespace EveryCupShop.Dtos;
 
-public record CreateCupDto(Guid CupShapeId, Guid CupAttachmentId);
+public record CreateCupDto(string Name, string Description, decimal Price, int Amount);

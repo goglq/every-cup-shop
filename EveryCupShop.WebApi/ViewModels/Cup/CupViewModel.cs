@@ -4,11 +4,11 @@ public class CupViewModel
 {
     public Guid Id { get; set; }
     
-    public CupShapeViewModel CupShape { get; set; }
+    public string Name { get; set; }
     
-    public Guid CupShapeId { get; set; }
-
-    public CupAttachmentViewModel CupAttachment { get; set; }
+    public string Description { get; set; }
     
-    public Guid CupAttachmentId { get; set; }
+    public decimal Price { get; set; }
+    
+    public int Amount { get; set; }
 }

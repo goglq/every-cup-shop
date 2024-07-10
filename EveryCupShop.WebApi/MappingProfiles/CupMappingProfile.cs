@@ -11,11 +11,5 @@ public class CupMappingProfile : Profile
         CreateMap<Cup, CreateCupViewModel>();
         CreateMap<Cup, ChangeCupViewModel>();
         CreateMap<Cup, CupViewModel>();
-
-        CreateMap<CupShape, CreateCupShapeViewModel>();
-        CreateMap<CupShape, CupShapeViewModel>();
-
-        CreateMap<CupAttachment, CreateCupAttachmentViewModel>();
-        CreateMap<CupAttachment, CupAttachmentViewModel>();
     }
 }
